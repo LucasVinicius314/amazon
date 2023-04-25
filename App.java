@@ -1,97 +1,150 @@
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 import javax.swing.*;
 
-class Node {
-
-  public Node(int key, int x, int y) {
-    this.key = key;
-    this.x = x;
-    this.y = y;
-  }
-
-  int key;
-  int x;
-  int y;
-
-  final List<Node> neighbours = new ArrayList<>();
-}
-
+/**
+ * Classe principal do app.
+ */
 public class App {
 
+  // Map principal com os nodes indexados por id.
   static Map<Integer, Node> nodes = new HashMap<>();
 
   public static void main(String[] args) {
+    // Inicializar a rede de nodes.
     initNetwork();
 
+    // Inicializar a UI.
     initUI();
   }
 
-  static void createNode(int key, int x, int y, String neighbours) {
-    final var node = new Node(key, x, y);
+  /**
+   * Método para criar um node a partir do id, posição e nodes vizinhos.
+   * @param key
+   * @param x
+   * @param y
+   * @param neighbours
+   * @return
+   */
+  static Node createNode(int key, int x, int y, String neighbours) {
+    // Tentar recuperar o node já existente com esse id.
+    var node = nodes.get(key);
 
+    if (node == null) {
+      // Caso o node não exista, criá-lo.
+      node = new Node(key, x, y);
+    } else {
+      // Caso o node exista, atualizar suas coordenadas.
+      node.x = x;
+      node.y = y;
+    }
+
+    // Caso o node tenha vizinhos.
     if (neighbours != null) {
+      // Dividir e iterar sobre cada elemento da string de vizinhos do node.
       for (final var item : neighbours.split(",")) {
-        final var neighbour = nodes.get(Integer.parseInt(item));
+        final var neighbourKey = Integer.parseInt(item);
 
+        // Tentar recuperar o vizinho já existente.
+        var neighbour = nodes.get(neighbourKey);
+
+        // Criar o vizinho caso ele não exista.
+        if (neighbour == null) {
+          neighbour = createNode(neighbourKey, 0, 0, null);
+        }
+
+        // Associar node -> vizinho.
         node.neighbours.add(neighbour);
+        // Associar vizinho -> node.
         neighbour.neighbours.add(node);
       }
     }
 
+    // Adicionar o node criado ao map de nodes.
     nodes.put(key, node);
+
+    // Retornar o node criado.
+    return node;
   }
 
+  /**
+   * Método para inicializar a network de nodes a partir do arquivo de entrada.
+   * @return
+   */
   static void initNetwork() {
-    // createNode(0, 10, 10, null);
-    // createNode(1, 10, 20, "0");
-    // createNode(2, 30, 10, "0,1");
-
+    // Buscar linhas de entrada do arquivo de entrada.
     final var lines = readInput();
 
+    // Iterar sobre as linhas do arquivo de entrada.
     for (final var line : lines) {
-      final var args = line.split(" ");
+      // Dividir a linha em cada espaço.
+      final var args = Arrays.asList(line.split(" "));
 
-      final var index = Integer.parseInt(args[0]);
-      final var x = Integer.parseInt(args[1]);
-      final var y = Integer.parseInt(args[2]);
+      // Pegar o primeiro elemento da linha, o id do node.
+      final var index = Integer.parseInt(args.get(0));
+      // Pegar o segundo elemento da linha, a coordenada x do node.
+      final var x = Integer.parseInt(args.get(1));
+      // Pegar o terceiro elemento da linha, a coordenada y do node.
+      final var y = Integer.parseInt(args.get(2));
 
-      var neighbours = "";
+      // Caso a linha de entrada tenha vizinhos.
+      if (args.size() > 3) {
+        // Pegar os vizinhos da linha e colocar numa string separada por vírgula.
+        final var neighbours = args
+          .subList(3, args.size())
+          .stream()
+          .collect(Collectors.joining(","));
 
-      int i = args.length - 1;
-      while (i >= 3) {
-        neighbours += args[i];
+        // Criar node com vizinhos.
+        createNode(index, x, y, neighbours);
+      } else {
+        // Criar node sem vizinhos.
+        createNode(index, x, y, null);
       }
-
-      createNode(index, x, y, neighbours);
     }
-
-    lines.toString();
   }
 
+  /**
+   * Método para inicializar a UI a partir dos nodes da network.
+   * @return
+   */
   static void initUI() {
-    final var frame = new JFrame("My Window");
+    // Declarar a janela principal do app.
+    final var frame = new JFrame("Main window");
 
+    // Declarar o painel responsável pela visualização da network.
     final var panel = new Panel();
-    panel.setSize(200, 200);
+    // Alterar as dimensões do painel.
+    panel.setSize(400, 400);
 
+    // Colocar o painel dentro da janela principal.
     frame.add(panel);
 
     frame.pack();
+    // Tornar a janela principal visível.
     frame.setVisible(true);
+    // Alterar as dimensões da janela principal.
     frame.setSize(400, 400);
   }
 
+  /**
+   * Método para ler e retornar o conteúdo do arquivo de entrada.
+   * @return
+   */
   static List<String> readInput() {
+    // Declarar o array de saída.
     final var list = new ArrayList<String>();
 
     try {
+      // Ler o arquivo de entrada.
+
       final var file = new File("in.dat");
       final var scanner = new Scanner(file);
 
@@ -105,24 +158,7 @@ public class App {
       e.printStackTrace();
     }
 
+    // Retornar o array de saída.
     return list;
-  }
-}
-
-class Panel extends JPanel {
-
-  @Override
-  public void paintComponent(Graphics g) {
-    super.paintComponent(g);
-
-    for (final var set : App.nodes.entrySet()) {
-      final var node = set.getValue();
-
-      g.drawOval(node.x - 3, node.y - 3, 6, 6);
-
-      for (final var neighbour : node.neighbours) {
-        g.drawLine(node.x, node.y, neighbour.x, neighbour.y);
-      }
-    }
   }
 }
