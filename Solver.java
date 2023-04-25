@@ -1,25 +1,41 @@
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: fix, docs
+/**
+ * Classe responsável pelos cálculos de resolução do problema.
+ */
 public class Solver {
 
+  /**
+   * Método para calcular o custo de um caminho, levando em consideração os nodes e a carga máxima.
+   * @param nodes
+   * @param maxCargo
+   * @return
+   */
   public static double getPathCost(List<Node> nodes, int maxCargo) {
+    // Declarar o array de saída.
     final var cargo = new ArrayList<Node>();
 
+    // Declarar o custo inicial do caminho como 0.
     var cost = 0.0;
 
+    // Declarar o índice do node atual como 0.
     var currentNodeIndex = 0;
 
+    // Referência para último node visitado, utilizado nos cálculos de distância.
     Node lastNode = null;
 
+    // Iterar sobre cada node do caminho.
     while (true) {
+      // Enquanto o índice atual do node não chegar ao tamanho do caminho.
       if (currentNodeIndex == nodes.size()) {
         break;
       }
 
+      // Pegar o node atual baseado no índice do node atual.
       final var currentNode = nodes.get(currentNodeIndex);
 
+      // TODO: fix
       if (cargo.contains(currentNode)) {
         cargo.remove(currentNode);
       }

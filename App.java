@@ -18,22 +18,32 @@ public class App {
   static Map<Integer, Node> nodes = new HashMap<>();
 
   public static void main(String[] args) {
+    // Nome do arquivo de entrada.
+    final var filePath = "in.dat";
+    // Carga máxima do caminhão.
+    final var maxCargo = 10;
+
     // Inicializar a rede de nodes.
-    initNetwork();
+    initNetwork(filePath);
 
     // Inicializar a UI.
     initUI();
 
-    final var maxCargo = 10;
-
-    final var j = Solver
+    // Calcular todos os caminhos possíveis.
+    final var allPaths = Solver
       .getPermutations()
       .stream()
       .map(e -> new Path(e, maxCargo))
       .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
       .collect(Collectors.toList());
 
-    j.toString();
+    // Filtrar caminhos possíveis, que permitem todas as entregas sem estourar o limite de carga do caminhão e sem passar em um node mais de uma vez.
+    final var possiblePaths = allPaths
+      .stream()
+      .filter(e -> e.cost > 0)
+      .collect(Collectors.toList());
+
+    possiblePaths.toString();
   }
 
   /**
@@ -73,9 +83,6 @@ public class App {
 
         // Associar node -> vizinho.
         node.neighbours.add(neighbour);
-        // TODO: fix
-        // Associar vizinho -> node.
-        // neighbour.neighbours.add(node);
       }
     }
 
@@ -90,9 +97,9 @@ public class App {
    * Método para inicializar a network de nodes a partir do arquivo de entrada.
    * @return
    */
-  static void initNetwork() {
+  static void initNetwork(String filePath) {
     // Buscar linhas de entrada do arquivo de entrada.
-    final var lines = readInput();
+    final var lines = readInput(filePath);
 
     // Iterar sobre as linhas do arquivo de entrada.
     for (final var line : lines) {
@@ -150,14 +157,14 @@ public class App {
    * Método para ler e retornar o conteúdo do arquivo de entrada.
    * @return
    */
-  static List<String> readInput() {
+  static List<String> readInput(String filePath) {
     // Declarar o array de saída.
     final var list = new ArrayList<String>();
 
     try {
       // Ler o arquivo de entrada.
 
-      final var file = new File("in.dat");
+      final var file = new File(filePath);
       final var scanner = new Scanner(file);
 
       while (scanner.hasNextLine()) {
