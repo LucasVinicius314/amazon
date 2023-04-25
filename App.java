@@ -23,6 +23,17 @@ public class App {
 
     // Inicializar a UI.
     initUI();
+
+    final var maxCargo = 10;
+
+    final var j = Solver
+      .getPermutations()
+      .stream()
+      .map(e -> new Path(e, maxCargo))
+      .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
+      .collect(Collectors.toList());
+
+    j.toString();
   }
 
   /**
@@ -62,8 +73,9 @@ public class App {
 
         // Associar node -> vizinho.
         node.neighbours.add(neighbour);
+        // TODO: fix
         // Associar vizinho -> node.
-        neighbour.neighbours.add(node);
+        // neighbour.neighbours.add(node);
       }
     }
 
