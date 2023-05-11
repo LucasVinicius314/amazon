@@ -47,10 +47,6 @@ public class App {
     possiblePaths.toString();
     System.out.println(possiblePaths.getClass());
 
-    // Classe para pegar menor valor do custo possivel, porém vetor list esta
-    // ordenado então o menor custo e o primeiro nó
-    final var bd = new bound();
-    bd.searchFinalElement(possiblePaths);
   }
 
   /**
