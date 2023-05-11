@@ -31,23 +31,31 @@ public class App {
 
     // Calcular todos os caminhos possíveis.
     final var allPaths = Solver
-      .getPermutations()
-      .stream()
-      .map(e -> new Path(e, maxCargo))
-      .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
-      .collect(Collectors.toList());
+        .getPermutations()
+        .stream()
+        .map(e -> new Path(e, maxCargo))
+        .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
+        .collect(Collectors.toList());
 
-    // Filtrar caminhos possíveis, que permitem todas as entregas sem estourar o limite de carga do caminhão e sem passar em um node mais de uma vez.
+    // Filtrar caminhos possíveis, que permitem todas as entregas sem estourar o
+    // limite de carga do caminhão e sem passar em um node mais de uma vez.
     final var possiblePaths = allPaths
-      .stream()
-      .filter(e -> e.cost > 0)
-      .collect(Collectors.toList());
+        .stream()
+        .filter(e -> e.cost > 0)
+        .collect(Collectors.toList());
 
     possiblePaths.toString();
+    System.out.println(possiblePaths.getClass());
+
+    // Classe para pegar menor valor do custo possivel, porém vetor list esta
+    // ordenado então o menor custo e o primeiro nó
+    final var bd = new bound();
+    bd.searchFinalElement(possiblePaths);
   }
 
   /**
    * Método para criar um node a partir do id, posição e nodes vizinhos.
+   * 
    * @param key
    * @param x
    * @param y
@@ -95,6 +103,7 @@ public class App {
 
   /**
    * Método para inicializar a network de nodes a partir do arquivo de entrada.
+   * 
    * @return
    */
   static void initNetwork(String filePath) {
@@ -117,9 +126,9 @@ public class App {
       if (args.size() > 3) {
         // Pegar os vizinhos da linha e colocar numa string separada por vírgula.
         final var neighbours = args
-          .subList(3, args.size())
-          .stream()
-          .collect(Collectors.joining(","));
+            .subList(3, args.size())
+            .stream()
+            .collect(Collectors.joining(","));
 
         // Criar node com vizinhos.
         createNode(index, x, y, neighbours);
@@ -132,6 +141,7 @@ public class App {
 
   /**
    * Método para inicializar a UI a partir dos nodes da network.
+   * 
    * @return
    */
   static void initUI() {
@@ -155,6 +165,7 @@ public class App {
 
   /**
    * Método para ler e retornar o conteúdo do arquivo de entrada.
+   * 
    * @return
    */
   static List<String> readInput(String filePath) {
