@@ -45,7 +45,6 @@ public class App {
         .collect(Collectors.toList());
 
     possiblePaths.toString();
-    System.out.println(possiblePaths.getClass());
 
   }
 
