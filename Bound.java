@@ -23,6 +23,7 @@ public class Bound {
     return permutatedPaths;
   }
 
+  // Realizar teste no coast nessa func
   static <T> List<List<T>> permutate(List<T> list) {
     final var result = new ArrayList<List<T>>();
 

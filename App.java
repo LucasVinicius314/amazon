@@ -47,11 +47,13 @@ public class App {
     possiblePaths.toString();
 
     // Iniciando branch and bound
-    // final var allPathsBranchBound = Bound
-    // .getPermutations()
-    // .stream()
-    // .map(e -> new Path(e, maxCargo));
+    final var allPathsBranchBound = Bound
+        .getPermutations()
+        .stream()
+        .map(e -> new Path(e, maxCargo))
+        .collect(Collectors.toList());
 
+    "".toString();
   }
 
   /**
