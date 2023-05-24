@@ -39,21 +39,23 @@ public class App {
 
     // Filtrar caminhos possíveis, que permitem todas as entregas sem estourar o
     // limite de carga do caminhão e sem passar em um node mais de uma vez.
-    final var possiblePaths = allPaths
-        .stream()
-        .filter(e -> e.cost > 0)
-        .collect(Collectors.toList());
-
-    possiblePaths.toString();
-
-    // Iniciando branch and bound
-    final var allPathsBranchBound = Bound
-        .getPermutations()
-        .stream()
-        .map(e -> new Path(e, maxCargo))
-        .collect(Collectors.toList());
+    // final var possiblePaths = allPaths
+    // .stream()
+    // .filter(e -> e.cost > 0)
+    // .collect(Collectors.toList());
 
     "".toString();
+
+    // possiblePaths.toString();
+
+    // Iniciando branch and bound
+    // final var allPathsBranchBound = Bound
+    // .getPermutations()
+    // .stream()
+    // .map(e -> new Path(e, maxCargo))
+    // .collect(Collectors.toList());
+
+    // "".toString();
   }
 
   /**

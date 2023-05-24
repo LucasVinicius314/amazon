@@ -7,7 +7,9 @@ import java.util.List;
 public class Solver {
 
   /**
-   * Método para calcular o custo de um caminho, levando em consideração os nodes e a carga máxima.
+   * Método para calcular o custo de um caminho, levando em consideração os nodes
+   * e a carga máxima.
+   * 
    * @param nodes
    * @param maxCargo
    * @return
@@ -73,6 +75,9 @@ public class Solver {
     for (final var permutatedPath : permutatedPaths) {
       permutatedPath.add(0, rootNode);
       permutatedPath.add(rootNode);
+
+      boolean isValid = validatePermu(permutatedPath);
+
     }
 
     return permutatedPaths;
@@ -108,4 +113,32 @@ public class Solver {
 
     return result;
   }
+
+  static boolean validatePermu(List<Node> permu) {
+
+    // "0,1,6,8,7,9,4,5,3,2,0"
+
+    List<Integer> locaisPassados = new ArrayList<>();
+
+    List<Node> precisaDeEntregar = new ArrayList<>();
+
+    for (int i = 0; i < permu.size() - 1; i++) {
+
+      Node nodeAnalisado = permu.get(i);
+      locaisPassados.add(nodeAnalisado.key);
+
+      if (!nodeAnalisado.neighbours.isEmpty()) {
+        precisaDeEntregar.add(nodeAnalisado);
+      }
+
+      // testar agora se o local passado é um lugar que tem que entregar um elemento,
+      // se tiver remove do vizinhos
+
+    }
+
+    "".toString();
+    return true;
+
+  }
+
 }
