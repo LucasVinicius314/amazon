@@ -30,6 +30,7 @@ public class App {
     initUI();
 
     // Calcular todos os caminhos possíveis.
+    // Já pega somente os caminhos validos
     final var allPaths = Solver
         .getPermutations()
         .stream()

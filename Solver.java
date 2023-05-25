@@ -7,7 +7,9 @@ import java.util.List;
 public class Solver {
 
   /**
-   * Método para calcular o custo de um caminho, levando em consideração os nodes e a carga máxima.
+   * Método para calcular o custo de um caminho, levando em consideração os nodes
+   * e a carga máxima.
+   * 
    * @param nodes
    * @param maxCargo
    * @return
@@ -70,9 +72,17 @@ public class Solver {
 
     final var permutatedPaths = permutate(nodes);
 
-    for (final var permutatedPath : permutatedPaths) {
+    for (final var permutatedPath : new ArrayList<>(permutatedPaths)) {
+
       permutatedPath.add(0, rootNode);
       permutatedPath.add(rootNode);
+
+      boolean isValid = validatePermu(permutatedPath);
+
+      if (!isValid) {
+        permutatedPaths.remove(permutatedPath);
+      }
+
     }
 
     return permutatedPaths;
@@ -80,6 +90,8 @@ public class Solver {
 
   static <T> List<List<T>> permutate(List<T> list) {
     final var result = new ArrayList<List<T>>();
+
+    // "0,1,6,8,7,9,4,5,3,2,0"
 
     if (list.size() == 0) {
       result.add(new ArrayList<>());
@@ -108,4 +120,48 @@ public class Solver {
 
     return result;
   }
+
+  // validatePermu testa se cada entrega é feita em todas as localidades, caso ele
+  // mantenha alguma entre pendente a permutacao é descartada
+  // Retorna true caso a lista de entregas termine vazia e retorna false caso
+  // tenha entregas pendentes
+  static boolean validatePermu(List<Node> permu) {
+
+    List<Integer> locaisPassados = new ArrayList<>();
+
+    List<Integer> precisaDeEntregar = new ArrayList<>();
+
+    for (int i = 0; i < permu.size(); i++) {
+
+      Node nodeAnalisado = permu.get(i);
+      locaisPassados.add(nodeAnalisado.key);
+
+      for (int j = 0; j < precisaDeEntregar.size(); j++) {
+
+        if (precisaDeEntregar.get(j) == nodeAnalisado.key) {
+          precisaDeEntregar.remove(Integer.valueOf(precisaDeEntregar.get(j)));
+
+        }
+      }
+
+      if (!nodeAnalisado.neighbours.isEmpty()) {
+
+        for (Node neighboursNode : nodeAnalisado.neighbours) {
+
+          precisaDeEntregar.add(neighboursNode.key);
+
+        }
+
+      }
+
+    }
+
+    if (precisaDeEntregar.isEmpty()) {
+      return true;
+    } else {
+      return false;
+    }
+
+  }
+
 }
