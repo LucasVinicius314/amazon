@@ -44,8 +44,6 @@ public class App {
     // .filter(e -> e.cost > 0)
     // .collect(Collectors.toList());
 
-    "".toString();
-
     // possiblePaths.toString();
 
     // Iniciando branch and bound
@@ -55,7 +53,6 @@ public class App {
     // .map(e -> new Path(e, maxCargo))
     // .collect(Collectors.toList());
 
-    // "".toString();
   }
 
   /**

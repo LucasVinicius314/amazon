@@ -72,11 +72,16 @@ public class Solver {
 
     final var permutatedPaths = permutate(nodes);
 
-    for (final var permutatedPath : permutatedPaths) {
+    for (final var permutatedPath : new ArrayList<>(permutatedPaths)) {
+
       permutatedPath.add(0, rootNode);
       permutatedPath.add(rootNode);
 
       boolean isValid = validatePermu(permutatedPath);
+
+      if (!isValid) {
+        permutatedPaths.remove(permutatedPath);
+      }
 
     }
 
@@ -85,6 +90,8 @@ public class Solver {
 
   static <T> List<List<T>> permutate(List<T> list) {
     final var result = new ArrayList<List<T>>();
+
+    // "0,1,6,8,7,9,4,5,3,2,0"
 
     if (list.size() == 0) {
       result.add(new ArrayList<>());
@@ -114,30 +121,46 @@ public class Solver {
     return result;
   }
 
+  // validatePermu testa se cada entrega é feita em todas as localidades, caso ele
+  // mantenha alguma entre pendente a permutacao é descartada
+  // Retorna true caso a lista de entregas termine vazia e retorna false caso
+  // tenha entregas pendentes
   static boolean validatePermu(List<Node> permu) {
-
-    // "0,1,6,8,7,9,4,5,3,2,0"
 
     List<Integer> locaisPassados = new ArrayList<>();
 
-    List<Node> precisaDeEntregar = new ArrayList<>();
+    List<Integer> precisaDeEntregar = new ArrayList<>();
 
-    for (int i = 0; i < permu.size() - 1; i++) {
+    for (int i = 0; i < permu.size(); i++) {
 
       Node nodeAnalisado = permu.get(i);
       locaisPassados.add(nodeAnalisado.key);
 
-      if (!nodeAnalisado.neighbours.isEmpty()) {
-        precisaDeEntregar.add(nodeAnalisado);
+      for (int j = 0; j < precisaDeEntregar.size(); j++) {
+
+        if (precisaDeEntregar.get(j) == nodeAnalisado.key) {
+          precisaDeEntregar.remove(Integer.valueOf(precisaDeEntregar.get(j)));
+
+        }
       }
 
-      // testar agora se o local passado é um lugar que tem que entregar um elemento,
-      // se tiver remove do vizinhos
+      if (!nodeAnalisado.neighbours.isEmpty()) {
+
+        for (Node neighboursNode : nodeAnalisado.neighbours) {
+
+          precisaDeEntregar.add(neighboursNode.key);
+
+        }
+
+      }
 
     }
 
-    "".toString();
-    return true;
+    if (precisaDeEntregar.isEmpty()) {
+      return true;
+    } else {
+      return false;
+    }
 
   }
 
