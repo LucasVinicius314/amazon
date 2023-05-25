@@ -63,7 +63,7 @@ public class Solver {
     return cost;
   }
 
-  public static List<List<Node>> getPermutations() {
+  public static List<List<Node>> getPermutations(boolean validate) {
     final var nodes = new ArrayList<>(App.nodes.values());
 
     final var rootNode = App.nodes.get(0);
@@ -77,10 +77,12 @@ public class Solver {
       permutatedPath.add(0, rootNode);
       permutatedPath.add(rootNode);
 
-      boolean isValid = validatePermu(permutatedPath);
+      if (validate) {
+        boolean isValid = validatePermu(permutatedPath);
 
-      if (!isValid) {
-        permutatedPaths.remove(permutatedPath);
+        if (!isValid) {
+          permutatedPaths.remove(permutatedPath);
+        }
       }
 
     }
