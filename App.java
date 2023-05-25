@@ -31,38 +31,39 @@ public class App {
 
     // Calcular todos os caminhos possíveis.
     // Já pega somente os caminhos validos
-    final var allPaths = Solver
-        .getPermutations(false)
-        .stream()
-        .map(e -> new Path(e, maxCargo))
-        .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
-        .collect(Collectors.toList());
+    // final var allPaths = Solver
+    // .getPermutations(false)
+    // .stream()
+    // .map(e -> new Path(e, maxCargo))
+    // .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
+    // .collect(Collectors.toList());
 
     // Filtrar caminhos possíveis, que permitem todas as entregas sem estourar o
     // limite de carga do caminhão e sem passar em um node mais de uma vez.
-    final var possiblePaths = Solver
-        .getPermutations(true)
-        .stream()
-        .map(e -> new Path(e, maxCargo))
-        .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
-        .collect(Collectors.toList());
+    // final var possiblePaths = Solver
+    // .getPermutations(true)
+    // .stream()
+    // .map(e -> new Path(e, maxCargo))
+    // .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
+    // .collect(Collectors.toList());
 
-    // Printar o caminho da melhor permutação
-    System.out.print("Melhor caminho: ");
-    for (Node node : possiblePaths.get(0).nodes) {
-      System.out.print("[" + node.key + "], ");
+    // // Printar o caminho da melhor permutação
+    // System.out.print("Melhor caminho: ");
+    // for (Node node : possiblePaths.get(0).nodes) {
+    // System.out.print("[" + node.key + "], ");
 
-    }
-    System.out.print("Custo: " + possiblePaths.get(0).cost);
-    "".toString();
+    // }
+    // System.out.print("Custo: " + possiblePaths.get(0).cost);
+    // "".toString();
 
     // Iniciando branch and bound
 
-    // final var allPathsBranchBound = Bound
-    // .getPermutations()
-    // .stream()
-    // .map(e -> new Path(e, maxCargo))
-    // .collect(Collectors.toList());
+    final var allPathsBranchBound = Bound
+        .getPermutations(maxCargo)
+        .stream()
+        .collect(Collectors.toList());
+
+    "".toString();
 
   }
 
