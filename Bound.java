@@ -2,8 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Classe para realizar branch and bound.
-// Verificar elemento durante a realização das permutacoes
-// Mofificar a classe para realizar a permutacao testando qual é o menor elemento
+// Permutacao SEM ALTERAÇÃO AINDA.
 public class Bound {
 
   public static List<List<Node>> getPermutations() {
@@ -23,7 +22,6 @@ public class Bound {
     return permutatedPaths;
   }
 
-  // Realizar teste no coast nessa func
   static <T> List<List<T>> permutate(List<T> list) {
     final var result = new ArrayList<List<T>>();
 
@@ -54,5 +52,4 @@ public class Bound {
 
     return result;
   }
-
 }
