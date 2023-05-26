@@ -21,7 +21,7 @@ public class App {
     // Nome do arquivo de entrada.
     final var filePath = "in.dat";
     // Carga máxima do caminhão.
-    final var maxCargo = 10;
+    final var maxCargo = 2;
 
     // Inicializar a rede de nodes.
     initNetwork(filePath);
@@ -60,7 +60,8 @@ public class App {
     }
     System.out.println("Custo: " + possiblePaths.get(0).cost);
     long totalTime = (endTime - startTime);
-    System.out.println("O tempo de execucao do brute force foi de: " + totalTime + " ms");
+    System.out.println("O tempo de execucao do brute force foi de: " + totalTime
+        + " ms");
 
     // Iniciando branch and bound
 

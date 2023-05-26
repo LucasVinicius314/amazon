@@ -76,7 +76,7 @@ public class Solver {
 
     List<Node> saveUltimoPath = new ArrayList<>();
 
-    double costMin = pa.cost * 1000;
+    double costMin = 1000000.00;
 
     for (final var permutatedPath : new ArrayList<>(permutatedPaths)) {
 
@@ -84,7 +84,7 @@ public class Solver {
       permutatedPath.add(rootNode);
 
       if (validate) {
-        boolean isValid = validatePermu(permutatedPath);
+        boolean isValid = validatePermu(permutatedPath, maxCargo);
 
         // Caso a solucao seja validada pela funcao validatePermu, ele gera o custo e
         // assim, testa se tem um custo menor, se não tiver ele exclui da lista, caso
@@ -93,20 +93,24 @@ public class Solver {
 
           pa = new Path(permutatedPath, maxCargo);
 
-          if (pa.cost < costMin) {
+          if (pa.cost >= 0) {
 
-            costMin = pa.cost;
+            if (pa.cost < costMin) {
 
-            if (saveUltimoPath.size() != 0) {
-              permutatedPaths.remove(saveUltimoPath);
+              costMin = pa.cost;
+
+              if (saveUltimoPath.size() != 0) {
+                permutatedPaths.remove(saveUltimoPath);
+              }
+
+              saveUltimoPath = permutatedPath;
+
+            } else {
+              permutatedPaths.remove(permutatedPath);
             }
-
-            saveUltimoPath = permutatedPath;
-
           } else {
             permutatedPaths.remove(permutatedPath);
           }
-
         } else {
           permutatedPaths.remove(permutatedPath);
         }
@@ -154,7 +158,7 @@ public class Solver {
   // mantenha alguma entre pendente a permutacao é descartada
   // Retorna true caso a lista de entregas termine vazia e retorna false caso
   // tenha entregas pendentes
-  static boolean validatePermu(List<Node> permu) {
+  static boolean validatePermu(List<Node> permu, int maxCargo) {
 
     List<Integer> locaisPassados = new ArrayList<>();
 
@@ -181,7 +185,11 @@ public class Solver {
             return false;
           }
 
-          precisaDeEntregar.add(neighboursNode.key);
+          if (precisaDeEntregar.size() < maxCargo) {
+            precisaDeEntregar.add(neighboursNode.key);
+          } else {
+            return false;
+          }
 
         }
 
