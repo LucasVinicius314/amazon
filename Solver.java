@@ -63,7 +63,7 @@ public class Solver {
     return cost;
   }
 
-  public static List<List<Node>> getPermutations(boolean validate) {
+  public static List<List<Node>> getPermutations(boolean validate, int maxCargo) {
     final var nodes = new ArrayList<>(App.nodes.values());
 
     final var rootNode = App.nodes.get(0);
@@ -71,6 +71,12 @@ public class Solver {
     nodes.remove(rootNode);
 
     final var permutatedPaths = permutate(nodes);
+
+    Path pa = new Path(permutatedPaths.get(0), maxCargo);
+
+    List<Node> saveUltimoPath = new ArrayList<>();
+
+    double costMin = pa.cost * 1000;
 
     for (final var permutatedPath : new ArrayList<>(permutatedPaths)) {
 
@@ -80,7 +86,28 @@ public class Solver {
       if (validate) {
         boolean isValid = validatePermu(permutatedPath);
 
-        if (!isValid) {
+        // Caso a solucao seja validada pela funcao validatePermu, ele gera o custo e
+        // assim, testa se tem um custo menor, se não tiver ele exclui da lista, caso
+        // tenha o menor custo ja encontrado ele mantem na lista (permutatedPaths).
+        if (isValid) {
+
+          pa = new Path(permutatedPath, maxCargo);
+
+          if (pa.cost < costMin) {
+
+            costMin = pa.cost;
+
+            if (saveUltimoPath.size() != 0) {
+              permutatedPaths.remove(saveUltimoPath);
+            }
+
+            saveUltimoPath = permutatedPath;
+
+          } else {
+            permutatedPaths.remove(permutatedPath);
+          }
+
+        } else {
           permutatedPaths.remove(permutatedPath);
         }
       }
