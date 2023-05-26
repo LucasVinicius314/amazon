@@ -40,6 +40,9 @@ public class App {
 
     // Filtrar caminhos possíveis, que permitem todas as entregas sem estourar o
     // limite de carga do caminhão e sem passar em um node mais de uma vez.
+
+    long startTime = System.currentTimeMillis();
+
     final var possiblePaths = Solver
         .getPermutations(true, maxCargo)
         .stream()
@@ -47,13 +50,17 @@ public class App {
         .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
         .collect(Collectors.toList());
 
+    long endTime = System.currentTimeMillis();
+
     // // Printar o caminho da melhor permutação
     System.out.print("Melhor caminho: ");
     for (Node node : possiblePaths.get(0).nodes) {
       System.out.print("[" + node.key + "], ");
 
     }
-    System.out.print("Custo: " + possiblePaths.get(0).cost);
+    System.out.println("Custo: " + possiblePaths.get(0).cost);
+    long totalTime = (endTime - startTime);
+    System.out.println("O tempo de execucao do brute force foi de: " + totalTime + " ms");
 
     // Iniciando branch and bound
 

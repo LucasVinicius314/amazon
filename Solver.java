@@ -177,6 +177,10 @@ public class Solver {
 
         for (Node neighboursNode : nodeAnalisado.neighbours) {
 
+          if (locaisPassados.contains(Integer.valueOf(neighboursNode.key))) {
+            return false;
+          }
+
           precisaDeEntregar.add(neighboursNode.key);
 
         }
