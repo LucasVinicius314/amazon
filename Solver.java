@@ -8,18 +8,21 @@ public class Solver {
 
   /**
    * Método para calcular o custo de um caminho, levando em consideração os nodes
-   * e a carga máxima.
+   * e a carga máxima, e o withRend consiste em caso queira calcular a distancia
+   * com rendimento passa true sem redimento passa false.
    * 
    * @param nodes
    * @param maxCargo
+   * @param withRend
    * @return
    */
-  public static double getPathCost(List<Node> nodes, int maxCargo) {
+  public static double getPathCost(List<Node> nodes, int maxCargo, boolean withRend) {
     // Declarar o array de saída.
     final var cargo = new ArrayList<Node>();
-
+    List<Node> entregas = new ArrayList<>();
     // Declarar o custo inicial do caminho como 0.
     var cost = 0.0;
+    var costMedio = 0.0;
 
     // Declarar o índice do node atual como 0.
     var currentNodeIndex = 0;
@@ -52,7 +55,38 @@ public class Solver {
         final var deltaX = Math.pow(currentNode.x - lastNode.x, 2);
         final var deltaY = Math.pow(currentNode.y - lastNode.y, 2);
 
-        cost += Math.sqrt(deltaX + deltaY);
+        if (!withRend) {
+          cost += Math.sqrt(deltaX + deltaY);
+        } else {
+          costMedio = Math.sqrt(deltaX + deltaY);
+        }
+      }
+
+      // fazer o custo com rendimento
+      if (withRend && lastNode != null) {
+
+        if (lastNode.neighbours.size() != 0) {
+
+          for (Node node : lastNode.neighbours) {
+            entregas.add(node);
+          }
+
+        }
+
+        cost += costMedio / (10 - (0.5 * entregas.size()));
+
+        if (entregas.size() != 0) {
+
+          for (Node node : new ArrayList<Node>(entregas)) {
+
+            if (node.key == currentNode.key) {
+              entregas.remove(node);
+            }
+
+          }
+
+        }
+
       }
 
       lastNode = currentNode;
