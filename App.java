@@ -52,11 +52,7 @@ public class App {
 
     long endTime = System.currentTimeMillis();
 
-    // Calculando rendimento do melhor caminho
-    possiblePaths.get(0).getRend(maxCargo);
-
     // // Printar o caminho da melhor permutação
-
     if (possiblePaths.size() != 0) {
 
       System.out.print("Melhor caminho: ");

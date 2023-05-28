@@ -13,13 +13,7 @@ public class Path {
     // carga máxima.
     this.cost = Solver.getPathCost(nodes, maxCargo, false);
     // inicializando rendimento
-    this.rend = 0.0;
-  }
-
-  public Path() {
-    this.nodes = null;
-    this.cost = 0.0;
-    this.rend = 0.0;
+    this.rend = Solver.getPathCost(nodes, maxCargo, true);
   }
 
   // Nodes que fazem parte do caminho.
@@ -38,7 +32,4 @@ public class Path {
         .collect(Collectors.joining(","));
   }
 
-  public void getRend(int maxCargo) {
-    this.rend = Solver.getPathCost(nodes, maxCargo, true);
-  }
 }
