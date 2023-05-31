@@ -21,7 +21,7 @@ public class App {
     // Nome do arquivo de entrada.
     final var filePath = "in.dat";
     // Carga máxima do caminhão.
-    final var maxCargo = 2;
+    final var maxCargo = 10;
 
     // Inicializar a rede de nodes.
     initNetwork(filePath);
@@ -31,12 +31,12 @@ public class App {
 
     // Calcular todos os caminhos possíveis.
     // Já pega somente os caminhos validos
-    final var allPaths = Solver
-        .getPermutations(false, maxCargo)
-        .stream()
-        .map(e -> new Path(e, maxCargo))
-        .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
-        .collect(Collectors.toList());
+    // final var allPaths = Solver
+    // .getPermutations(false, maxCargo)
+    // .stream()
+    // .map(e -> new Path(e, maxCargo))
+    // .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
+    // .collect(Collectors.toList());
 
     // Filtrar caminhos possíveis, que permitem todas as entregas sem estourar o
     // limite de carga do caminhão e sem passar em um node mais de uma vez.
@@ -60,7 +60,7 @@ public class App {
         System.out.print("[" + node.key + "], ");
 
       }
-      System.out.println("Custo: " + possiblePaths.get(0).cost);
+      System.out.println("\nCusto: " + possiblePaths.get(0).cost);
       long totalTime = (endTime - startTime);
       System.out.println("O tempo de execucao do brute force foi de: " + totalTime
           + " ms");

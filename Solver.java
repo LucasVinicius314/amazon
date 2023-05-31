@@ -16,13 +16,14 @@ public class Solver {
    * @param withRend
    * @return
    */
-  public static double getPathCost(List<Node> nodes, int maxCargo, boolean withRend) {
+  public static Atalho getPathCost(List<Node> nodes, int maxCargo) {
     // Declarar o array de saída.
     final var cargo = new ArrayList<Node>();
     List<Node> entregas = new ArrayList<>();
     // Declarar o custo inicial do caminho como 0.
     var cost = 0.0;
     var costMedio = 0.0;
+    var rendimento = 0.0;
 
     // Declarar o índice do node atual como 0.
     var currentNodeIndex = 0;
@@ -48,22 +49,20 @@ public class Solver {
       cargo.addAll(currentNode.neighbours);
 
       if (cargo.size() > maxCargo) {
-        return -1;
+        Atalho atalhoRetVazio = new Atalho(-1, -1);
+        return atalhoRetVazio;
       }
 
       if (lastNode != null) {
         final var deltaX = Math.pow(currentNode.x - lastNode.x, 2);
         final var deltaY = Math.pow(currentNode.y - lastNode.y, 2);
 
-        if (!withRend) {
-          cost += Math.sqrt(deltaX + deltaY);
-        } else {
-          costMedio = Math.sqrt(deltaX + deltaY);
-        }
+        cost += Math.sqrt(deltaX + deltaY);
+        costMedio = Math.sqrt(deltaX + deltaY);
       }
 
       // fazer o custo com rendimento
-      if (withRend && lastNode != null) {
+      if (lastNode != null) {
 
         if (lastNode.neighbours.size() != 0) {
 
@@ -73,7 +72,7 @@ public class Solver {
 
         }
 
-        cost += costMedio / (10 - (0.5 * entregas.size()));
+        rendimento += costMedio / (10 - (0.5 * entregas.size()));
 
         if (entregas.size() != 0) {
 
@@ -94,7 +93,9 @@ public class Solver {
       currentNodeIndex++;
     }
 
-    return cost;
+    Atalho atalhoRetSolucao = new Atalho(cost, rendimento);
+
+    return atalhoRetSolucao;
   }
 
   public static List<List<Node>> getPermutations(boolean validate, int maxCargo) {
@@ -117,6 +118,9 @@ public class Solver {
       permutatedPath.add(0, rootNode);
       permutatedPath.add(rootNode);
 
+      // Calcula o custo e rendimento para todas as permutações
+      pa = new Path(permutatedPath, maxCargo);
+
       if (validate) {
         boolean isValid = validatePermu(permutatedPath, maxCargo);
 
@@ -124,8 +128,6 @@ public class Solver {
         // assim, testa se tem um custo menor, se não tiver ele exclui da lista, caso
         // tenha o menor custo ja encontrado ele mantem na lista (permutatedPaths).
         if (isValid) {
-
-          pa = new Path(permutatedPath, maxCargo);
 
           if (pa.cost >= 0) {
 
