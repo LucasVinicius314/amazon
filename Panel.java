@@ -19,7 +19,10 @@ public class Panel extends JPanel {
       g.drawString(String.valueOf(node.key), node.x, node.y - 6);
 
       // Para cada vizinho do node.
-      for (final var neighbour : node.neighbours) {
+      for (final var key : node.items) {
+
+        final var neighbour = App.nodes.get(key);
+
         // Desenhar uma linha entre o node e o vizinho.
         g.drawLine(node.x, node.y, neighbour.x, neighbour.y);
       }

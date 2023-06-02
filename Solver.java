@@ -1,10 +1,44 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Classe responsável pelos cálculos de resolução do problema.
  */
 public class Solver {
+
+  public static void bruteForce(Map<Integer, Node> nodes, Node node, Truck truck, int maxCargo) {
+
+    // if (nodes.isEmpty()) {
+
+    // return;
+    // }
+
+    nodes.remove(node.key);
+
+    final var a = new ArrayList<>(nodes.values());
+
+    for (final var newNode : a) {
+
+      final var j = node.distanceTo(newNode);
+
+      truck.currentCargo.addAll(newNode.items);
+      truck.currentPath.push(newNode);
+      truck.distance += j;
+
+      bruteForce(nodes, newNode, truck, maxCargo);
+
+      truck.currentCargo.removeAll(newNode.items);
+      truck.currentPath.pop();
+      truck.distance -= j;
+    }
+
+    nodes.put(node.key, node);
+
+    System.out.println(truck);
+  }
 
   /**
    * Método para calcular o custo de um caminho, levando em consideração os nodes
@@ -46,7 +80,7 @@ public class Solver {
         cargo.remove(currentNode);
       }
 
-      cargo.addAll(currentNode.neighbours);
+      // cargo.addAll(currentNode.items);
 
       if (cargo.size() > maxCargo) {
         Atalho atalhoRetVazio = new Atalho(-1, -1);
@@ -64,11 +98,11 @@ public class Solver {
       // fazer o custo com rendimento
       if (lastNode != null) {
 
-        if (lastNode.neighbours.size() != 0) {
+        if (lastNode.items.size() != 0) {
 
-          for (Node node : lastNode.neighbours) {
-            entregas.add(node);
-          }
+          // for (Node node : lastNode.items) {
+          // entregas.add(node);
+          // }
 
         }
 
@@ -213,21 +247,21 @@ public class Solver {
         }
       }
 
-      if (!nodeAnalisado.neighbours.isEmpty()) {
+      if (!nodeAnalisado.items.isEmpty()) {
 
-        for (Node neighboursNode : nodeAnalisado.neighbours) {
+        // for (Node neighboursNode : nodeAnalisado.items) {
 
-          if (locaisPassados.contains(Integer.valueOf(neighboursNode.key))) {
-            return false;
-          }
+        // if (locaisPassados.contains(Integer.valueOf(neighboursNode.key))) {
+        // return false;
+        // }
 
-          if (precisaDeEntregar.size() < maxCargo) {
-            precisaDeEntregar.add(neighboursNode.key);
-          } else {
-            return false;
-          }
+        // if (precisaDeEntregar.size() < maxCargo) {
+        // precisaDeEntregar.add(neighboursNode.key);
+        // } else {
+        // return false;
+        // }
 
-        }
+        // }
 
       }
 

@@ -19,7 +19,7 @@ public class App {
 
   public static void main(String[] args) {
     // Nome do arquivo de entrada.
-    final var filePath = "in.dat";
+    final var filePath = "in-3.dat";
     // Carga máxima do caminhão.
     final var maxCargo = 10;
 
@@ -28,6 +28,12 @@ public class App {
 
     // Inicializar a UI.
     initUI();
+
+    final var truck = new Truck();
+
+    Solver.bruteForce(nodes, nodes.get(0), truck, maxCargo);
+
+    "".toString();
 
     // Calcular todos os caminhos possíveis.
     // Já pega somente os caminhos validos
@@ -41,44 +47,45 @@ public class App {
     // Filtrar caminhos possíveis, que permitem todas as entregas sem estourar o
     // limite de carga do caminhão e sem passar em um node mais de uma vez.
 
-    long startTime = System.currentTimeMillis();
+    // long startTime = System.currentTimeMillis();
 
-    final var possiblePaths = Solver
-        .getPermutations(true, maxCargo)
-        .stream()
-        .map(e -> new Path(e, maxCargo))
-        .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
-        .collect(Collectors.toList());
-
-    long endTime = System.currentTimeMillis();
-
-    // // Printar o caminho da melhor permutação
-    if (possiblePaths.size() != 0) {
-
-      System.out.print("Melhor caminho: ");
-      for (Node node : possiblePaths.get(0).nodes) {
-        System.out.print("[" + node.key + "], ");
-
-      }
-      System.out.println("\nCusto: " + possiblePaths.get(0).cost);
-      long totalTime = (endTime - startTime);
-      System.out.println("O tempo de execucao do brute force foi de: " + totalTime
-          + " ms");
-      System.out.println("Com o rendimento de combustivel de: " + possiblePaths.get(0).rend);
-    } else {
-      System.out.println("Não foi possível encontrar caminhos !");
-    }
-
-    "".toString();
-
-    // Iniciando branch and bound
-
-    // final var allPathsBranchBound = Bound
-    // .getPermutations()
+    // final var possiblePaths = Solver
+    // .getPermutations(true, maxCargo)
     // .stream()
     // .map(e -> new Path(e, maxCargo))
     // .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
     // .collect(Collectors.toList());
+
+    // long endTime = System.currentTimeMillis();
+
+    // // // Printar o caminho da melhor permutação
+    // if (possiblePaths.size() != 0) {
+
+    // System.out.print("Melhor caminho: ");
+    // for (Node node : possiblePaths.get(0).nodes) {
+    // System.out.print("[" + node.key + "], ");
+
+    // }
+    // System.out.println("\nCusto: " + possiblePaths.get(0).cost);
+    // long totalTime = (endTime - startTime);
+    // System.out.println("O tempo de execucao do brute force foi de: " + totalTime
+    // + " ms");
+    // System.out.println("Com o rendimento de combustivel de: " +
+    // possiblePaths.get(0).rend);
+    // } else {
+    // System.out.println("Não foi possível encontrar caminhos !");
+    // }
+
+    // "".toString();
+
+    // // Iniciando branch and bound
+
+    // // final var allPathsBranchBound = Bound
+    // // .getPermutations()
+    // // .stream()
+    // // .map(e -> new Path(e, maxCargo))
+    // // .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
+    // // .collect(Collectors.toList());
   }
 
   /**
@@ -118,7 +125,7 @@ public class App {
         }
 
         // Associar node -> vizinho.
-        node.neighbours.add(neighbour);
+        node.items.add(neighbour.key);
       }
     }
 
