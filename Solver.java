@@ -9,18 +9,64 @@ import java.util.Set;
  */
 public class Solver {
 
+  static List<Truck> caminhoSalvo = new ArrayList<Truck>();
+
   public static void bruteForce(Map<Integer, Node> nodes, Node node, Truck truck, int maxCargo) {
+    List<Integer> todosItens = new ArrayList<Integer>();
+    public Set<Integer> currentCargo = new HashSet<Integer>();
 
-    // if (nodes.isEmpty()) {
+    for (Node no : nodes.values()) {
+      for (Integer item : no.items) {
+        todosItens.add(item);
+      }
+    }
 
-    // return;
-    // }
+    bruteForce(nodes, node, truck, maxCargo, todosItens);
+
+    var menorCusto = truck;
+    for (Truck caminhao : caminhoSalvo) {
+      if (menorCusto.distance < caminhao.distance) {
+        menorCusto = caminhao;
+        // System.out.println(caminhao);
+      }
+    }
+
+    System.out.println(menorCusto);
+  }
+
+  public static void bruteForce(Map<Integer, Node> nodes, Node node, Truck truck, int maxCargo,
+      List<Integer> todosItens) {
+
+    todosItens.removeIf(t -> t == node.key);
+
+    if (todosItens.isEmpty()) {
+      final var j = node.distanceTo(truck.currentPath.elementAt(0));
+
+      truck.currentPath.push(truck.currentPath.elementAt(0));
+      truck.distance += j;
+
+      caminhoSalvo.add(truck);
+      return;
+    }
 
     nodes.remove(node.key);
+
+    // for (Integer item : node.items) {
+    // todosItens.removeIf(t -> t == item);
+    // }
+
+    // Precisa ver se tem o item na lista de todos os itens e não pegou ainda
 
     final var a = new ArrayList<>(nodes.values());
 
     for (final var newNode : a) {
+
+      // if( truck.currentCargo.contains(newNode.key) &&
+      // todosItens.contains(newNode.key) ){
+
+      if (truck.currentCargo.size() + newNode.items.size() > maxCargo) {
+        continue;
+      }
 
       final var j = node.distanceTo(newNode);
 
@@ -28,11 +74,12 @@ public class Solver {
       truck.currentPath.push(newNode);
       truck.distance += j;
 
-      bruteForce(nodes, newNode, truck, maxCargo);
+      bruteForce(nodes, newNode, truck, maxCargo, todosItens);
 
       truck.currentCargo.removeAll(newNode.items);
       truck.currentPath.pop();
       truck.distance -= j;
+
     }
 
     nodes.put(node.key, node);
