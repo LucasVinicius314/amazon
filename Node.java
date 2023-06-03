@@ -28,8 +28,8 @@ public class Node {
     return Math.sqrt(Math.pow(x - (double) newNode.x, 2) + Math.pow(y - (double) newNode.y, 2));
   }
 
-  public double getRend(Truck truck) {
-    return truck.distance / (10 - (0.5 * truck.currentCargo.size()));
+  public double getRend(Node node, Truck truck) {
+    return distanceTo(node) / (10 - (0.5) * truck.currentCargo.size());
   }
 
   @Override
