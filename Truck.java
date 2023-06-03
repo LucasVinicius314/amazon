@@ -35,8 +35,8 @@ public class Truck {
 
   public void remove(Node node, Node nextNode) {
 
-    currentCargo.removeAll(nextNode.items);
     currentPath.pop();
+    currentCargo.removeAll(nextNode.items);
     distance -= node.distanceTo(nextNode);
     rendimento -= node.getRend(nextNode, this);
   }
@@ -44,7 +44,7 @@ public class Truck {
   @Override
   public String toString() {
 
-    return String.format("Truck d: %.2f r: %.2f%n%s",
+    return String.format("Truck d: %.4f r: %.4f%n%s",
         distance,
         rendimento,
         currentPath

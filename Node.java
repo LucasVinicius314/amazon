@@ -30,7 +30,8 @@ public class Node {
    * @return
    */
   public double distanceTo(Node newNode) {
-    return Math.sqrt(Math.pow(x - newNode.x, 2) + Math.pow(y - newNode.y, 2));
+    var a = Math.sqrt(Math.pow(x - newNode.x, 2) + Math.pow(y - newNode.y, 2));
+    return a;
   }
 
   /**
@@ -42,7 +43,8 @@ public class Node {
    * @return
    */
   public double getRend(Node node, Truck truck) {
-    return distanceTo(node) / (10 - .5 * truck.currentCargo.size());
+    var a = distanceTo(node) / (10 - .5 * truck.currentCargo.size());
+    return a;
   }
 
   @Override

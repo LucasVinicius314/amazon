@@ -17,6 +17,13 @@ public class Solver {
     // Remover o node atual da carga do caminhão.
     truck.currentCargo.remove(node.key);
 
+    // Viola restrição de carga max
+    if (truck.currentCargo.size() > maxCargo) {
+      truck.currentCargo.add(node.key);
+      nodes.put(node.key, node);
+      return;
+    }
+
     // Clonar lista de nodes.
     final var newNodes = new ArrayList<>(nodes.values());
 
@@ -26,7 +33,6 @@ public class Solver {
       if (App.allItems.contains(newNode.key)) {
         // Violação de restrição: indo para um node que deve receber itens, sem ter os
         // itens no caminhão.
-
         continue;
       }
 
@@ -36,24 +42,17 @@ public class Solver {
       // Adicionar o node.
       truck.add(node, newNode);
 
-      if (nodes.isEmpty()) {
-
-        truck.add(newNode, App.nodes.get(0));
-      }
-
       // Expandir.
       bruteForce(nodes, newNode, truck, maxCargo);
-
-      if (nodes.isEmpty()) {
-
-        truck.remove(newNode, App.nodes.get(0));
-      }
 
       // Desfazer a adição do node.
       truck.remove(node, newNode);
 
       // Colocar os itens que foram colocados de volta na lista de itens global.
       App.allItems.addAll(newNode.items);
+
+      System.out.println("-------------------");
+
     }
 
     // Print caso não há mais nodes para ir.
@@ -71,6 +70,7 @@ public class Solver {
       }
     }
 
+    truck.currentCargo.add(node.key);
     // Desfazer a remoção do node atual.
     nodes.put(node.key, node);
   }
