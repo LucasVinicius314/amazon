@@ -19,11 +19,13 @@ public class App {
   // Map principal com os nodes indexados por id.
   static Map<Integer, Node> nodes = new HashMap<>();
 
-  static Set<Integer> allItems = new HashSet<Integer>();
+  static Set<Integer> allItems = new HashSet<>();
+
+  static Truck bestSolution = null;
 
   public static void main(String[] args) {
     // Nome do arquivo de entrada.
-    final var filePath = "in.dat";
+    final var filePath = "in-6.dat";
     // Carga máxima do caminhão.
     final var maxCargo = 10;
 
@@ -35,66 +37,21 @@ public class App {
 
     final var truck = new Truck();
 
-    for (final var node : nodes.values()) {
+    final var newNodes = new HashMap<>(nodes);
+
+    for (final var node : newNodes.values()) {
 
       allItems.addAll(node.items);
     }
 
-    Solver.bruteForce(nodes, nodes.get(0), truck, maxCargo);
+    final var rootNode = newNodes.get(0);
 
-    "".toString();
+    truck.currentCargo.addAll(rootNode.items);
+    truck.currentPath.push(rootNode);
 
-    // Calcular todos os caminhos possíveis.
-    // Já pega somente os caminhos validos
-    // final var allPaths = Solver
-    // .getPermutations(false, maxCargo)
-    // .stream()
-    // .map(e -> new Path(e, maxCargo))
-    // .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
-    // .collect(Collectors.toList());
+    Solver.bruteForce(newNodes, rootNode, truck, maxCargo);
 
-    // Filtrar caminhos possíveis, que permitem todas as entregas sem estourar o
-    // limite de carga do caminhão e sem passar em um node mais de uma vez.
-
-    // long startTime = System.currentTimeMillis();
-
-    // final var possiblePaths = Solver
-    // .getPermutations(true, maxCargo)
-    // .stream()
-    // .map(e -> new Path(e, maxCargo))
-    // .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
-    // .collect(Collectors.toList());
-
-    // long endTime = System.currentTimeMillis();
-
-    // // // Printar o caminho da melhor permutação
-    // if (possiblePaths.size() != 0) {
-
-    // System.out.print("Melhor caminho: ");
-    // for (Node node : possiblePaths.get(0).nodes) {
-    // System.out.print("[" + node.key + "], ");
-
-    // }
-    // System.out.println("\nCusto: " + possiblePaths.get(0).cost);
-    // long totalTime = (endTime - startTime);
-    // System.out.println("O tempo de execucao do brute force foi de: " + totalTime
-    // + " ms");
-    // System.out.println("Com o rendimento de combustivel de: " +
-    // possiblePaths.get(0).rend);
-    // } else {
-    // System.out.println("Não foi possível encontrar caminhos !");
-    // }
-
-    // "".toString();
-
-    // // Iniciando branch and bound
-
-    // // final var allPathsBranchBound = Bound
-    // // .getPermutations()
-    // // .stream()
-    // // .map(e -> new Path(e, maxCargo))
-    // // .sorted((a, b) -> (int) Math.round(a.cost - b.cost))
-    // // .collect(Collectors.toList());
+    Utils.log(String.format("%n%n%s", bestSolution));
   }
 
   /**
@@ -106,7 +63,7 @@ public class App {
    * @param neighbours
    * @return
    */
-  static Node createNode(int key, int x, int y, String neighbours) {
+  static Node createNode(int key, double x, double y, String neighbours) {
     // Tentar recuperar o node já existente com esse id.
     var node = nodes.get(key);
 
@@ -162,9 +119,9 @@ public class App {
       // Pegar o primeiro elemento da linha, o id do node.
       final var index = Integer.parseInt(args.get(0));
       // Pegar o segundo elemento da linha, a coordenada x do node.
-      final var x = Integer.parseInt(args.get(1));
+      final var x = Double.parseDouble(args.get(1));
       // Pegar o terceiro elemento da linha, a coordenada y do node.
-      final var y = Integer.parseInt(args.get(2));
+      final var y = Double.parseDouble(args.get(2));
 
       // Caso a linha de entrada tenha vizinhos.
       if (args.size() > 3) {
@@ -228,7 +185,7 @@ public class App {
 
       scanner.close();
     } catch (FileNotFoundException e) {
-      System.out.println("File not found");
+      Utils.log("File not found.");
       e.printStackTrace();
     }
 

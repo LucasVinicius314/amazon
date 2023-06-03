@@ -13,19 +13,32 @@ public class Panel extends JPanel {
     // Iterar sobre cada node da network.
     for (final var node : App.nodes.values()) {
       // Desenhar um círculo que representa o node.
-      g.drawOval(node.x - 3, node.y - 3, 6, 6);
+      g.drawOval((int) Math.round(node.x - 3), (int) Math.round(node.y - 3), 6, 6);
 
       // Escrever o id do node.
-      g.drawString(String.valueOf(node.key), node.x, node.y - 6);
+      g.drawString(String.valueOf(node.key), (int) Math.round(node.x), (int) Math.round(node.y - 6));
+    }
 
-      // Para cada vizinho do node.
-      for (final var key : node.items) {
+    Node lastNode = null;
 
-        final var neighbour = App.nodes.get(key);
+    // Iterar sobre cada node da network.
+    for (final var node : App.bestSolution.currentPath) {
 
-        // Desenhar uma linha entre o node e o vizinho.
-        g.drawLine(node.x, node.y, neighbour.x, neighbour.y);
+      if (lastNode == null) {
+
+        lastNode = node;
+
+        continue;
       }
+
+      // Desenhar uma linha entre o node e o vizinho.
+      g.drawLine(
+          (int) Math.round(node.x),
+          (int) Math.round(node.y),
+          (int) Math.round(lastNode.x),
+          (int) Math.round(lastNode.y));
+
+      lastNode = node;
     }
   }
 }

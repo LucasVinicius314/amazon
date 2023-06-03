@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -9,7 +8,7 @@ import java.util.stream.Collectors;
  */
 public class Node {
 
-  public Node(int key, int x, int y) {
+  public Node(int key, double x, double y) {
     this.key = key;
     this.x = x;
     this.y = y;
@@ -18,18 +17,32 @@ public class Node {
   // Id do node.
   int key;
   // Coordenada x do node.
-  int x;
+  double x;
   // Coordenada y do node.
-  int y;
+  double y;
 
   final List<Integer> items = new ArrayList<>();
 
+  /**
+   * Método para calcular a distância entre dois nodes.
+   * 
+   * @param newNode
+   * @return
+   */
   public double distanceTo(Node newNode) {
-    return Math.sqrt(Math.pow(x - (double) newNode.x, 2) + Math.pow(y - (double) newNode.y, 2));
+    return Math.sqrt(Math.pow(x - newNode.x, 2) + Math.pow(y - newNode.y, 2));
   }
 
+  /**
+   * Método para calcular o rendimento entre dois nodes, a partir da distância
+   * entre eles.
+   * 
+   * @param node
+   * @param truck
+   * @return
+   */
   public double getRend(Node node, Truck truck) {
-    return distanceTo(node) / (10 - (0.5) * truck.currentCargo.size());
+    return distanceTo(node) / (10 - .5 * truck.currentCargo.size());
   }
 
   @Override
