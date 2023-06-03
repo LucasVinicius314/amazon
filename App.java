@@ -21,7 +21,7 @@ public class App {
     // Nome do arquivo de entrada.
     final var filePath = "in.dat";
     // Carga máxima do caminhão.
-    final var maxCargo = 10;
+    final var maxCargo = 2;
 
     // Inicializar a rede de nodes.
     initNetwork(filePath);
