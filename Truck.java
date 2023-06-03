@@ -11,6 +11,8 @@ public class Truck {
 
   public Stack<Node> currentPath = new Stack<Node>();
 
+  public double rendimento = 0.0;
+
   @Override
   public String toString() {
     return String.format("Truck %.2f\n%s",

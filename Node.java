@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +26,10 @@ public class Node {
 
   public double distanceTo(Node newNode) {
     return Math.sqrt(Math.pow(x - (double) newNode.x, 2) + Math.pow(y - (double) newNode.y, 2));
+  }
+
+  public double getRend(Truck truck) {
+    return truck.distance / (10 - (0.5 * truck.currentCargo.size()));
   }
 
   @Override

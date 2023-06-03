@@ -27,6 +27,7 @@ public class Solver {
       truck.currentCargo.addAll(newNode.items);
       truck.currentPath.push(newNode);
       truck.distance += j;
+      truck.rendimento += node.getRend(truck);
 
       bruteForce(nodes, newNode, truck, maxCargo);
 
