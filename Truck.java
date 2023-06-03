@@ -15,8 +15,9 @@ public class Truck {
 
   @Override
   public String toString() {
-    return String.format("Truck %.2f\n%s",
+    return String.format("Truck d: %.2f r: %.2f\n%s",
         distance,
+        rendimento,
         currentPath
             .stream()
             .map(e -> String.valueOf(e.key))

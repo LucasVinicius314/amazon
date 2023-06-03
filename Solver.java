@@ -1,8 +1,6 @@
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Classe responsável pelos cálculos de resolução do problema.
@@ -11,34 +9,74 @@ public class Solver {
 
   public static void bruteForce(Map<Integer, Node> nodes, Node node, Truck truck, int maxCargo) {
 
-    // if (nodes.isEmpty()) {
+    final var g = App.allItems;
+
+    // Remover node atual do map de nodes.
+    nodes.remove(node.key);
+
+    // Remover o node atual da carga do caminhão.
+    truck.currentCargo.remove(node.key);
+
+    // Clonar lista de nodes.
+    final var newNodes = new ArrayList<>(nodes.values());
+
+    // Iterar sobre a lista de nodes clonada.
+    for (final var newNode : newNodes) {
+
+      // final var a = node.key == 7;
+
+      // final var b = App.allItems.contains(node.key);
+
+      // if (a) {
+      // "".toString();
+      // }
+
+      // if (b) {
+      // // Violação de restrição: indo para um node que deve receber itens, sem ter
+      // os
+      // // itens no caminhão.
+
+      // return;
+      // }
+
+      // Calcular a distância para o próximo node.
+      final var distance = node.distanceTo(newNode);
+
+      // Remover os itens que foram pegos da lista de itens global.
+      App.allItems.removeAll(newNode.items);
+
+      // Contar com a adição do item.
+      truck.currentCargo.addAll(newNode.items);
+      truck.currentPath.push(newNode);
+      truck.distance += distance;
+      truck.rendimento += node.getRend(truck);
+
+      // Expandir.
+      bruteForce(nodes, newNode, truck, maxCargo);
+
+      // Desfazer adição do item.
+      truck.currentCargo.removeAll(newNode.items);
+      truck.currentPath.pop();
+      truck.distance -= distance;
+
+      // Colocar os itens que foram colocados de volta na lista de itens global.
+      App.allItems.addAll(newNode.items);
+    }
+
+    // if (!truck.currentCargo.isEmpty()) {
+    // // Violação da restrição: não foi possível fazer todas as entregas.
 
     // return;
     // }
 
-    nodes.remove(node.key);
+    // Print caso não há mais nodes para ir.
+    if (nodes.isEmpty()) {
 
-    final var a = new ArrayList<>(nodes.values());
-
-    for (final var newNode : a) {
-
-      final var j = node.distanceTo(newNode);
-
-      truck.currentCargo.addAll(newNode.items);
-      truck.currentPath.push(newNode);
-      truck.distance += j;
-      truck.rendimento += node.getRend(truck);
-
-      bruteForce(nodes, newNode, truck, maxCargo);
-
-      truck.currentCargo.removeAll(newNode.items);
-      truck.currentPath.pop();
-      truck.distance -= j;
+      System.out.println(truck);
     }
 
+    // Desfazer a remoção do node atual.
     nodes.put(node.key, node);
-
-    System.out.println(truck);
   }
 
   /**

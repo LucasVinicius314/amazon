@@ -3,9 +3,11 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.*;
 
@@ -17,9 +19,11 @@ public class App {
   // Map principal com os nodes indexados por id.
   static Map<Integer, Node> nodes = new HashMap<>();
 
+  static Set<Integer> allItems = new HashSet<Integer>();
+
   public static void main(String[] args) {
     // Nome do arquivo de entrada.
-    final var filePath = "in-3.dat";
+    final var filePath = "in.dat";
     // Carga máxima do caminhão.
     final var maxCargo = 10;
 
@@ -30,6 +34,11 @@ public class App {
     initUI();
 
     final var truck = new Truck();
+
+    for (final var node : nodes.values()) {
+
+      allItems.addAll(node.items);
+    }
 
     Solver.bruteForce(nodes, nodes.get(0), truck, maxCargo);
 
