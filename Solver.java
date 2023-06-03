@@ -41,6 +41,7 @@ public class Solver {
 
       // Calcular a distância para o próximo node.
       final var distance = node.distanceTo(newNode);
+      final var rendimento = node.getRend(newNode, truck);
 
       // Remover os itens que foram pegos da lista de itens global.
       App.allItems.removeAll(newNode.items);
@@ -49,7 +50,7 @@ public class Solver {
       truck.currentCargo.addAll(newNode.items);
       truck.currentPath.push(newNode);
       truck.distance += distance;
-      truck.rendimento += node.getRend(truck);
+      truck.rendimento += rendimento;
 
       // Expandir.
       bruteForce(nodes, newNode, truck, maxCargo);
@@ -58,6 +59,7 @@ public class Solver {
       truck.currentCargo.removeAll(newNode.items);
       truck.currentPath.pop();
       truck.distance -= distance;
+      truck.rendimento -= rendimento;
 
       // Colocar os itens que foram colocados de volta na lista de itens global.
       App.allItems.addAll(newNode.items);
