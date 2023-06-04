@@ -25,9 +25,9 @@ public class App {
 
   public static void main(String[] args) {
     // Nome do arquivo de entrada.
-    final var filePath = "in.dat";
+    final var filePath = "in-8.dat";
     // Carga máxima do caminhão.
-    final var maxCargo = 2;
+    final var maxCargo = 3;
 
     // Inicializar a rede de nodes.
     initNetwork(filePath);
@@ -48,7 +48,8 @@ public class App {
     truck.currentCargo.addAll(rootNode.items);
     truck.currentPath.push(rootNode);
 
-    Solver.bruteForce(newNodes, rootNode, truck, maxCargo);
+    // Solver.bruteForce(newNodes, rootNode, truck, maxCargo);
+    Solver.branchBound(newNodes, rootNode, truck, maxCargo);
 
     Utils.log(String.format("%n%n%s", bestSolution));
   }
