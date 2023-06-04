@@ -30,7 +30,7 @@ public class App {
   public static void main(String[] args) {
 
     // Nome do arquivo de entrada.
-    final var filePath = "in-11.dat";
+    final var filePath = "in.dat";
 
     // Carga máxima do caminhão.
     final var maxCargo = 3;
