@@ -47,6 +47,11 @@ public class Node {
     return a;
   }
 
+  public double getRend(double distance, Truck truck) {
+    var a = distance / (10 - .5 * truck.currentCargo.size());
+    return a;
+  }
+
   @Override
   public String toString() {
     // Mudar toString padrão do node para facilitar a visualização.

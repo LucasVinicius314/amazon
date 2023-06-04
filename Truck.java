@@ -15,10 +15,20 @@ public class Truck {
 
   public void add(Node node, Node nextNode) {
 
-    distance += node.distanceTo(nextNode);
-    rendimento += node.getRend(nextNode, this);
+    // distance += node.distanceTo(nextNode);
+    // rendimento += node.getRend(nextNode, this);
     currentCargo.addAll(nextNode.items);
     currentPath.push(nextNode);
+
+  }
+
+  public void add(Node nextNode) {
+
+    // distance += node.distanceTo(nextNode);
+    // rendimento += node.getRend(nextNode, this);
+    currentCargo.addAll(nextNode.items);
+    currentPath.push(nextNode);
+
   }
 
   static Truck newInstance(Truck truck) {
@@ -37,8 +47,17 @@ public class Truck {
 
     currentPath.pop();
     currentCargo.removeAll(nextNode.items);
-    distance -= node.distanceTo(nextNode);
-    rendimento -= node.getRend(nextNode, this);
+    // distance -= node.distanceTo(nextNode);
+    // rendimento -= node.getRend(nextNode, this);
+  }
+
+  public void remove(Node nextNode) {
+
+    currentCargo.removeAll(nextNode.items);
+    currentPath.pop();
+
+    // distance -= node.distanceTo(nextNode);
+    // rendimento -= node.getRend(nextNode, this);
   }
 
   @Override

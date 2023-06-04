@@ -25,7 +25,7 @@ public class App {
 
   public static void main(String[] args) {
     // Nome do arquivo de entrada.
-    final var filePath = "in-8.dat";
+    final var filePath = "in-10.dat";
     // Carga máxima do caminhão.
     final var maxCargo = 3;
 
@@ -45,13 +45,20 @@ public class App {
 
     final var rootNode = newNodes.get(0);
 
+    long init;
+    long end;
+
     truck.currentCargo.addAll(rootNode.items);
     truck.currentPath.push(rootNode);
-
+    init = System.currentTimeMillis();
     // Solver.bruteForce(newNodes, rootNode, truck, maxCargo);
     Solver.branchBound(newNodes, rootNode, truck, maxCargo);
+    end = System.currentTimeMillis();
+    end -= init;
 
+    System.out.println("Demorou " + end + " ms");
     Utils.log(String.format("%n%n%s", bestSolution));
+
   }
 
   /**
