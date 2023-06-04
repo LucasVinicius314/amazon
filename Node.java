@@ -47,6 +47,7 @@ public class Node {
 
   @Override
   public String toString() {
+
     // Mudar toString padrão do node para facilitar a visualização.
     return String.format(
         "Node(id: %d, x: %d, y: %d, neighbours: %s)",

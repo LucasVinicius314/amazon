@@ -23,6 +23,8 @@ public class Truck {
 
   public double rendimento = 0;
 
+  public long time = 0;
+
   public Set<Integer> currentCargo = new HashSet<>();
 
   public Stack<Node> currentPath = new Stack<>();

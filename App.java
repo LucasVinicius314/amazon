@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -10,11 +11,14 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 /**
  * Classe principal do app.
  */
 public class App {
+
+  static double gridOffset = 64;
 
   // Map principal com os nodes indexados por id.
   static Map<Integer, Node> nodes = new HashMap<>();
@@ -31,12 +35,13 @@ public class App {
     // Carga máxima do caminhão.
     final var maxCargo = 3;
 
-    // run(filePath, maxCargo, false, SolverMode.BRANCH_AND_BOUND);
+    // Inicializar a UI.
+    initUI(filePath, maxCargo);
 
-    runTests();
+    // runTests();
   }
 
-  static Truck run(String filePath, int maxCargo, boolean asTest, SolverMode solverMode) {
+  static Truck run(String filePath, int maxCargo, boolean isTest, SolverMode solverMode) {
 
     nodes.clear();
     allItems.clear();
@@ -44,12 +49,6 @@ public class App {
 
     // Inicializar a rede de nodes.
     initNetwork(filePath);
-
-    if (!asTest) {
-
-      // Inicializar a UI.
-      initUI();
-    }
 
     final var truck = new Truck();
 
@@ -78,21 +77,28 @@ public class App {
 
       Utils.log("\n(Branch and bound)");
 
-      Solver.branchBound(newNodes, rootNode, truck, maxCargo, !asTest);
+      Solver.branchBound(newNodes, rootNode, truck, maxCargo, !isTest);
 
       Utils.log("\n");
     } else {
 
       Utils.log("\n(Brute force)");
 
-      Solver.bruteForce(newNodes, rootNode, truck, maxCargo, !asTest);
+      Solver.bruteForce(newNodes, rootNode, truck, maxCargo, !isTest);
 
       Utils.log("\n");
     }
 
     final var now = System.currentTimeMillis();
 
-    Utils.log(String.format("Solucao (%d ms):%n%s", now - then, bestSolution));
+    final var diff = now - then;
+
+    Utils.log(String.format("Solucao (%d ms):%n%s", diff, bestSolution));
+
+    if (bestSolution != null) {
+
+      bestSolution.time = diff;
+    }
 
     return bestSolution;
   }
@@ -164,9 +170,9 @@ public class App {
       // Pegar o primeiro elemento da linha, o id do node.
       final var index = Integer.parseInt(args.get(0));
       // Pegar o segundo elemento da linha, a coordenada x do node.
-      final var x = Double.parseDouble(args.get(1));
+      final var x = Double.parseDouble(args.get(1)) + gridOffset;
       // Pegar o terceiro elemento da linha, a coordenada y do node.
-      final var y = Double.parseDouble(args.get(2));
+      final var y = Double.parseDouble(args.get(2)) + gridOffset;
 
       // Caso a linha de entrada tenha vizinhos.
       if (args.size() > 3) {
@@ -190,24 +196,91 @@ public class App {
    * 
    * @return
    */
-  static void initUI() {
+  static void initUI(String filePath, int maxCargo) {
 
-    // Declarar a janela principal do app.
+    // Instanciar janela principal.
     final var frame = new JFrame("Main window");
+    frame.setLayout(new FlowLayout(0));
 
-    // Declarar o painel responsável pela visualização da network.
-    final var panel = new Panel();
-    // Alterar as dimensões do painel.
-    panel.setSize(400, 400);
+    // Instanciar coluna.
+    final var column = new JPanel();
+    column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
+    column.setBorder(new EmptyBorder(8, 8, 8, 8));
+    frame.add(column);
 
-    // Colocar o painel dentro da janela principal.
-    frame.add(panel);
+    // Instanciar título.
+    final var label = new JLabel("Entrega de produtos com Branch and Bound e Brute Force");
+    label.setBorder(new EmptyBorder(0, 0, 8, 0));
+    column.add(label);
 
-    frame.pack();
-    // Tornar a janela principal visível.
+    // Instanciar botão de branch and bound.
+    final var branchAndBoundButton = new JButton("Branch and Bound");
+    branchAndBoundButton.addActionListener(e -> {
+
+      final var truck = run(filePath, maxCargo, false, SolverMode.BRANCH_AND_BOUND);
+
+      showSimulationWindow(truck);
+    });
+    column.add(branchAndBoundButton);
+
+    // Instanciar separador para adicionar um espaço entre os botões.
+    final var spacer = new JPanel();
+    spacer.setSize(0, 8);
+    column.add(spacer);
+
+    // Instanciar botão de brute force.
+    final var bruteForceButton = new JButton("Brute Force");
+    bruteForceButton.addActionListener(e -> {
+
+      final var truck = run(filePath, maxCargo, false, SolverMode.BRUTE_FORCE);
+
+      showSimulationWindow(truck);
+    });
+    column.add(bruteForceButton);
+
     frame.setVisible(true);
-    // Alterar as dimensões da janela principal.
-    frame.setSize(400, 400);
+    frame.pack();
+  }
+
+  static void showSimulationWindow(Truck truck) {
+
+    // Instanciar janela secundária.
+    final var simulationFrame = new JFrame("Simulation window");
+    simulationFrame.setSize(600, 600);
+    simulationFrame.setVisible(true);
+
+    // Instanciar janela do gráfico.
+    final var panel = new Panel();
+    panel.truck = truck;
+    panel.setSize(564, 564);
+    simulationFrame.add(panel);
+
+    // Referência para alterar o valor da animação evitando erro de escopo.
+    final var intRef = new IntRef();
+
+    // Instanciar time da animação
+    final var timer = new javax.swing.Timer(1000, y -> {
+    });
+
+    // Definir listener do timer.
+    timer.addActionListener(y -> {
+
+      // Atualizar estado da animação.
+      panel.steps = intRef.value;
+
+      // Re renderizar a janela.
+      simulationFrame.repaint();
+
+      // Parar animação caso o caminho chegue ao último ponto.
+      if (intRef.value == App.bestSolution.currentPath.size() - 1) {
+
+        timer.stop();
+      }
+
+      intRef.value++;
+    });
+
+    timer.start();
   }
 
   /**
@@ -290,4 +363,9 @@ public class App {
 
     Utils.log(String.format("%n>>> <SUCESSO> Teste finalizado para %s, carga máxima: %d%n", filePath, maxCargo));
   }
+}
+
+class IntRef {
+
+  public int value = 0;
 }
