@@ -24,16 +24,12 @@ public class Solver {
       // Criar um clone do caminhão atual, para não modificá-lo incorretamente.
       final var newTruck = Truck.newInstance(truck);
 
-      var noPai = newTruck.currentPath.firstElement();
-      var ultimoNo = newTruck.currentPath.lastElement();
-
-      var d = ultimoNo.distanceTo(noPai);
-      var r = ultimoNo.getRend(d, truck);
+      var d = newTruck.currentPath.lastElement().distanceTo(newTruck.currentPath.firstElement());
 
       // Adicionar a volta ate o no 0.
       newTruck.distance += d;
-      newTruck.rendimento += r;
-      newTruck.add(ultimoNo, App.nodes.get(0));
+      newTruck.rendimento += newTruck.currentPath.lastElement().getRend(d, truck);
+      newTruck.add(newTruck.currentPath.lastElement(), App.nodes.get(0));
 
       // Verificar se o novo caminhão é melhor que o melhor caminhão até agora
       if (App.bestSolution == null || newTruck.rendimento < App.bestSolution.rendimento) {
@@ -120,16 +116,12 @@ public class Solver {
       // Criar um clone do caminhão atual, para não modificá-lo incorretamente.
       final var newTruck = Truck.newInstance(truck);
 
-      var noPai = newTruck.currentPath.firstElement();
-      var ultimoNo = newTruck.currentPath.lastElement();
-
-      var d = ultimoNo.distanceTo(noPai);
-      var r = ultimoNo.getRend(d, truck);
+      var d = newTruck.currentPath.lastElement().distanceTo(newTruck.currentPath.firstElement());
 
       // Adicionar a volta ate o no 0.
       newTruck.distance += d;
-      newTruck.rendimento += r;
-      newTruck.add(ultimoNo, App.nodes.get(0));
+      newTruck.rendimento += newTruck.currentPath.lastElement().getRend(d, truck);
+      newTruck.add(newTruck.currentPath.lastElement(), App.nodes.get(0));
 
       // Verificar se o novo caminhão é melhor que o melhor caminhão até agora
       if (newTruck.valido()) {
