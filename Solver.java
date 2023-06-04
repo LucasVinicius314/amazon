@@ -132,9 +132,11 @@ public class Solver {
       newTruck.add(ultimoNo, App.nodes.get(0));
 
       // Verificar se o novo caminhão é melhor que o melhor caminhão até agora
-      if (App.bestSolution == null || newTruck.rendimento < App.bestSolution.rendimento) {
-        Utils.log(newTruck);
-        App.bestSolution = newTruck;
+      if (newTruck.valido()) {
+        if (App.bestSolution == null || newTruck.rendimento < App.bestSolution.rendimento) {
+          Utils.log(newTruck);
+          App.bestSolution = newTruck;
+        }
       }
     }
 
