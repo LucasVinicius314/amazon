@@ -1,244 +1,181 @@
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Classe responsável pelos cálculos de resolução do problema.
  */
 public class Solver {
+  public static int podas = 0;
 
-  /**
-   * Método para calcular o custo de um caminho, levando em consideração os nodes
-   * e a carga máxima, e o withRend consiste em caso queira calcular a distancia
-   * com rendimento passa true sem redimento passa false.
-   * 
-   * @param nodes
-   * @param maxCargo
-   * @param withRend
-   * @return
-   */
-  public static Atalho getPathCost(List<Node> nodes, int maxCargo) {
-    // Declarar o array de saída.
-    final var cargo = new ArrayList<Node>();
-    List<Node> entregas = new ArrayList<>();
-    // Declarar o custo inicial do caminho como 0.
-    var cost = 0.0;
-    var costMedio = 0.0;
-    var rendimento = 0.0;
-
-    // Declarar o índice do node atual como 0.
-    var currentNodeIndex = 0;
-
-    // Referência para último node visitado, utilizado nos cálculos de distância.
-    Node lastNode = null;
-
-    // Iterar sobre cada node do caminho.
-    while (true) {
-      // Enquanto o índice atual do node não chegar ao tamanho do caminho.
-      if (currentNodeIndex == nodes.size()) {
-        break;
-      }
-
-      // Pegar o node atual baseado no índice do node atual.
-      final var currentNode = nodes.get(currentNodeIndex);
-
-      // TODO: fix
-      if (cargo.contains(currentNode)) {
-        cargo.remove(currentNode);
-      }
-
-      cargo.addAll(currentNode.neighbours);
-
-      if (cargo.size() > maxCargo) {
-        Atalho atalhoRetVazio = new Atalho(-1, -1);
-        return atalhoRetVazio;
-      }
-
-      if (lastNode != null) {
-        final var deltaX = Math.pow(currentNode.x - lastNode.x, 2);
-        final var deltaY = Math.pow(currentNode.y - lastNode.y, 2);
-
-        cost += Math.sqrt(deltaX + deltaY);
-        costMedio = Math.sqrt(deltaX + deltaY);
-      }
-
-      // fazer o custo com rendimento
-      if (lastNode != null) {
-
-        if (lastNode.neighbours.size() != 0) {
-
-          for (Node node : lastNode.neighbours) {
-            entregas.add(node);
-          }
-
-        }
-
-        rendimento += costMedio / (10 - (0.5 * entregas.size()));
-
-        if (entregas.size() != 0) {
-
-          for (Node node : new ArrayList<Node>(entregas)) {
-
-            if (node.key == currentNode.key) {
-              entregas.remove(node);
-            }
-
-          }
-
-        }
-
-      }
-
-      lastNode = currentNode;
-
-      currentNodeIndex++;
-    }
-
-    Atalho atalhoRetSolucao = new Atalho(cost, rendimento);
-
-    return atalhoRetSolucao;
+  private Solver() {
   }
 
-  public static List<List<Node>> getPermutations(boolean validate, int maxCargo) {
-    final var nodes = new ArrayList<>(App.nodes.values());
+  public static void branchBound(Map<Integer, Node> nodes, Node node, Truck truck, int maxCargo) {
 
-    final var rootNode = App.nodes.get(0);
+    // Remover node atual do map de nodes.
+    nodes.remove(node.key);
 
-    nodes.remove(rootNode);
+    // Remover o node atual da carga do caminhão.
+    var colocaCaminhao = truck.currentCargo.remove(node.key);
 
-    final var permutatedPaths = permutate(nodes);
+    // Print caso não há mais nodes para ir.
+    if (nodes.isEmpty()) {
 
-    Path pa = new Path(permutatedPaths.get(0), maxCargo);
+      // Criar um clone do caminhão atual, para não modificá-lo incorretamente.
+      final var newTruck = Truck.newInstance(truck);
 
-    List<Node> saveUltimoPath = new ArrayList<>();
+      var d = newTruck.currentPath.lastElement().distanceTo(newTruck.currentPath.firstElement());
 
-    double costMin = 1000000.00;
+      // Adicionar a volta ate o no 0.
+      newTruck.distance += d;
+      newTruck.rendimento += newTruck.currentPath.lastElement().getRend(d, truck);
+      newTruck.add(newTruck.currentPath.lastElement(), App.nodes.get(0));
 
-    for (final var permutatedPath : new ArrayList<>(permutatedPaths)) {
+      // Verificar se o novo caminhão é melhor que o melhor caminhão até agora
+      if (App.bestSolution == null || newTruck.rendimento < App.bestSolution.rendimento) {
+        // Utils.log(newTruck);
+        App.bestSolution = newTruck;
+      }
+    }
 
-      permutatedPath.add(0, rootNode);
-      permutatedPath.add(rootNode);
+    // Viola restrição de carga max
+    // Viola restrição: se o redimento atual é maior que o melhor rendimento,
+    // não adianta fazer o no, pois é infrutifero
 
-      // Calcula o custo e rendimento para todas as permutações
-      pa = new Path(permutatedPath, maxCargo);
+    // if (!(truck.currentCargo.size() > maxCargo
+    // || (App.bestSolution != null && App.bestSolution.rendimento <
+    // truck.rendimento))) {
+    if (truck.currentCargo.size() <= maxCargo
+        && (App.bestSolution == null || App.bestSolution.rendimento > truck.rendimento)) {
 
-      if (validate) {
-        boolean isValid = validatePermu(permutatedPath, maxCargo);
+      // Clonar lista de nodes.
+      final var newNodes = new ArrayList<>(nodes.values());
 
-        // Caso a solucao seja validada pela funcao validatePermu, ele gera o custo e
-        // assim, testa se tem um custo menor, se não tiver ele exclui da lista, caso
-        // tenha o menor custo ja encontrado ele mantem na lista (permutatedPaths).
-        if (isValid) {
+      // Iterar sobre a lista de nodes clonada.
+      for (final var newNode : newNodes) {
 
-          if (pa.cost >= 0) {
-
-            if (pa.cost < costMin) {
-
-              costMin = pa.cost;
-
-              if (saveUltimoPath.size() != 0) {
-                permutatedPaths.remove(saveUltimoPath);
-              }
-
-              saveUltimoPath = permutatedPath;
-
-            } else {
-              permutatedPaths.remove(permutatedPath);
-            }
-          } else {
-            permutatedPaths.remove(permutatedPath);
-          }
-        } else {
-          permutatedPaths.remove(permutatedPath);
+        // Violação de restrição: indo para um node que deve receber itens, sem ter os
+        // itens no caminhão.
+        if (App.allItems.contains(newNode.key)) {
+          continue;
         }
+
+        // Chamada recursiva do branchBound
+        chamadaBranchBound(nodes, node, newNode, truck, maxCargo);
+
       }
 
     }
 
-    return permutatedPaths;
+    // Voltar com o node atual para carga do caminhão.
+    if (colocaCaminhao) {
+      truck.currentCargo.add(node.key);
+    }
+
+    // Voltar com o node atual para o map.
+    nodes.put(node.key, node);
   }
 
-  static <T> List<List<T>> permutate(List<T> list) {
-    final var result = new ArrayList<List<T>>();
+  static void chamadaBranchBound(Map<Integer, Node> nodes, Node node, Node newNode, Truck truck, int maxCargo) {
 
-    // "0,1,6,8,7,9,4,5,3,2,0"
+    // Remover os itens que foram pegos da lista de itens global.
+    App.allItems.removeAll(newNode.items);
 
-    if (list.size() == 0) {
-      result.add(new ArrayList<>());
+    // Calcular distancia e rendimento do no para o novoNo.
+    var d = node.distanceTo(newNode);
+    var r = node.getRend(d, truck);
 
-      return result;
-    }
+    truck.add(newNode); // Fazer a adição do node.
 
-    final var head = list.get(0);
+    truck.distance += d;
+    truck.rendimento += r;
 
-    final var rest = list.subList(1, list.size());
+    // Expandir.
+    branchBound(nodes, newNode, truck, maxCargo);
 
-    for (final var permutations : permutate(rest)) {
-      final var subLists = new ArrayList<List<T>>();
+    truck.rendimento -= r;
+    truck.distance -= d;
 
-      for (int i = 0; i <= permutations.size(); i++) {
-        final var subList = new ArrayList<T>();
+    truck.remove(newNode); // Desfazer a adição do node.
 
-        subList.addAll(permutations.subList(0, i));
-        subList.add(head);
-        subList.addAll(permutations.subList(i, permutations.size()));
-        subLists.add(subList);
-      }
-
-      result.addAll(subLists);
-    }
-
-    return result;
+    // Colocar os itens que foram pegos devolta, na lista de itens global.
+    App.allItems.addAll(newNode.items);
   }
 
-  // validatePermu testa se cada entrega é feita em todas as localidades, caso ele
-  // mantenha alguma entre pendente a permutacao é descartada
-  // Retorna true caso a lista de entregas termine vazia e retorna false caso
-  // tenha entregas pendentes
-  static boolean validatePermu(List<Node> permu, int maxCargo) {
+  static void chamadaBruteForce(Map<Integer, Node> nodes, Node node, Node newNode, Truck truck, int maxCargo) {
 
-    List<Integer> locaisPassados = new ArrayList<>();
+    // Remover os itens que foram pegos da lista de itens global.
+    App.allItems.removeAll(newNode.items);
 
-    List<Integer> precisaDeEntregar = new ArrayList<>();
+    // Calcular distancia e rendimento do no para o novoNo.
+    var d = node.distanceTo(newNode);
+    var r = node.getRend(d, truck);
 
-    for (int i = 0; i < permu.size(); i++) {
+    truck.add(newNode); // Fazer a adição do node.
 
-      Node nodeAnalisado = permu.get(i);
-      locaisPassados.add(nodeAnalisado.key);
+    truck.distance += d;
+    truck.rendimento += r;
 
-      for (int j = 0; j < precisaDeEntregar.size(); j++) {
+    // Expandir.
+    bruteForce(nodes, newNode, truck, maxCargo);
 
-        if (precisaDeEntregar.get(j) == nodeAnalisado.key) {
-          precisaDeEntregar.remove(Integer.valueOf(precisaDeEntregar.get(j)));
+    truck.rendimento -= r;
+    truck.distance -= d;
 
+    truck.remove(newNode); // Desfazer a adição do node.
+
+    // Colocar os itens que foram pegos devolta, na lista de itens global.
+    App.allItems.addAll(newNode.items);
+  }
+
+  public static void bruteForce(Map<Integer, Node> nodes, Node node, Truck truck, int maxCargo) {
+
+    // Remover node atual do map de nodes.
+    nodes.remove(node.key);
+
+    // Remover o node atual da carga do caminhão.
+    var colocaCaminhao = truck.currentCargo.remove(node.key);
+
+    // Print caso não há mais nodes para ir.
+    if (nodes.isEmpty()) {
+
+      // Criar um clone do caminhão atual, para não modificá-lo incorretamente.
+      final var newTruck = Truck.newInstance(truck);
+
+      var d = newTruck.currentPath.lastElement().distanceTo(newTruck.currentPath.firstElement());
+
+      // Adicionar a volta ate o no 0.
+      newTruck.distance += d;
+      newTruck.rendimento += newTruck.currentPath.lastElement().getRend(d, truck);
+      newTruck.add(newTruck.currentPath.lastElement(), App.nodes.get(0));
+
+      // Verificar se o novo caminhão é melhor que o melhor caminhão até agora
+
+      if (truck.currentCargo.size() == 0) {
+        if (App.bestSolution == null || newTruck.rendimento < App.bestSolution.rendimento) {
+          Utils.log(newTruck);
+          App.bestSolution = newTruck;
         }
       }
+    }
 
-      if (!nodeAnalisado.neighbours.isEmpty()) {
+    // Clonar lista de nodes.
+    final var newNodes = new ArrayList<>(nodes.values());
 
-        for (Node neighboursNode : nodeAnalisado.neighbours) {
+    // Iterar sobre a lista de nodes clonada.
+    for (final var newNode : newNodes) {
 
-          if (locaisPassados.contains(Integer.valueOf(neighboursNode.key))) {
-            return false;
-          }
-
-          if (precisaDeEntregar.size() < maxCargo) {
-            precisaDeEntregar.add(neighboursNode.key);
-          } else {
-            return false;
-          }
-
-        }
-
-      }
+      chamadaBruteForce(nodes, node, newNode, truck, maxCargo);
 
     }
 
-    if (precisaDeEntregar.isEmpty()) {
-      return true;
-    } else {
-      return false;
+    // Voltar com o node atual para carga do caminhão.
+    if (colocaCaminhao) {
+      truck.currentCargo.add(node.key);
     }
 
+    // Voltar com o node atual para o map.
+    nodes.put(node.key, node);
   }
 
 }
