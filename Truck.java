@@ -60,6 +60,19 @@ public class Truck {
     // rendimento -= node.getRend(nextNode, this);
   }
 
+  // TODO: terminar a verificação se o caminhao ta valido.
+  
+  // blic bool valido(){
+  // int quantItens = 0;
+  // r (Node integer : currentPath) {
+  //     if(){
+ 
+  //   }
+  //   }
+ 
+  //   return true;
+  // }
+
   @Override
   public String toString() {
 
