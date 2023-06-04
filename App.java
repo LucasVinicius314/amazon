@@ -30,7 +30,7 @@ public class App {
   public static void main(String[] args) {
 
     // Nome do arquivo de entrada.
-    final var filePath = "in.dat";
+    final var filePath = "in-11.dat";
 
     // Carga máxima do caminhão.
     final var maxCargo = 3;
@@ -219,7 +219,7 @@ public class App {
 
       final var truck = run(filePath, maxCargo, false, SolverMode.BRANCH_AND_BOUND);
 
-      showSimulationWindow(truck);
+      showSimulationWindow(truck, maxCargo, SolverMode.BRANCH_AND_BOUND);
     });
     column.add(branchAndBoundButton);
 
@@ -234,7 +234,7 @@ public class App {
 
       final var truck = run(filePath, maxCargo, false, SolverMode.BRUTE_FORCE);
 
-      showSimulationWindow(truck);
+      showSimulationWindow(truck, maxCargo, SolverMode.BRUTE_FORCE);
     });
     column.add(bruteForceButton);
 
@@ -242,7 +242,7 @@ public class App {
     frame.pack();
   }
 
-  static void showSimulationWindow(Truck truck) {
+  static void showSimulationWindow(Truck truck, int maxCargo, SolverMode solverMode) {
 
     // Instanciar janela secundária.
     final var simulationFrame = new JFrame("Simulation window");
@@ -252,6 +252,8 @@ public class App {
     // Instanciar janela do gráfico.
     final var panel = new Panel();
     panel.truck = truck;
+    panel.maxCargo = maxCargo;
+    panel.solverMode = solverMode;
     panel.setSize(564, 564);
     simulationFrame.add(panel);
 

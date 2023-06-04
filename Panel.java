@@ -9,6 +9,8 @@ import javax.swing.*;
 public class Panel extends JPanel {
 
   int steps;
+  int maxCargo;
+  SolverMode solverMode;
   Truck truck;
 
   @Override
@@ -22,20 +24,32 @@ public class Panel extends JPanel {
 
     g.drawString(
         String.format(
-            "%d ms, rendimento: %.4f, distância: %.4f, caminho: %s",
+            "%d ms, carga máxima: %d, modo: %s",
             truck.time,
-            truck.rendimento,
-            truck.distance,
-            path),
+            maxCargo,
+            solverMode == SolverMode.BRANCH_AND_BOUND ? "Branch and Bound" : "Brute Force"),
         8, 16);
+
+    g.drawString(
+        String.format(
+            "rendimento: %.4f, distância: %.4f",
+            truck.rendimento,
+            truck.distance),
+        8, 32);
+
+    g.drawString(String.format("caminho: %s", path), 8, 48);
 
     // Iterar sobre cada node da network.
     for (final var node : App.nodes.values()) {
       // Desenhar um círculo que representa o node.
       g.drawOval((int) Math.round(node.x - 3), (int) Math.round(node.y - 3), 6, 6);
 
+      g.setColor(Color.red);
+
       // Escrever o id do node.
       g.drawString(String.valueOf(node.key), (int) Math.round(node.x), (int) Math.round(node.y - 6));
+
+      g.setColor(Color.blue);
 
       final var items = node.items
           .stream()
@@ -44,6 +58,8 @@ public class Panel extends JPanel {
 
       // Escrever os itens do node.
       g.drawString(items, (int) Math.round(node.x), (int) Math.round(node.y + 16));
+
+      g.setColor(Color.black);
     }
 
     var stepsCounter = steps;
