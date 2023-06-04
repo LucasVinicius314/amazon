@@ -4,7 +4,7 @@ import java.util.stream.Collectors;
 
 /**
  * Classe que representa um node da network, com seu id, coordenadas x e y e sua
- * lista de vizinhos.
+ * lista de itens.
  */
 public class Node {
 
@@ -30,26 +30,19 @@ public class Node {
    * @return
    */
   public double distanceTo(Node newNode) {
-    var a = Math.sqrt(Math.pow(x - newNode.x, 2) + Math.pow(y - newNode.y, 2));
-    return a;
+    return Math.sqrt(Math.pow(x - newNode.x, 2) + Math.pow(y - newNode.y, 2));
   }
 
   /**
    * Método para calcular o rendimento entre dois nodes, a partir da distância
    * entre eles.
    * 
-   * @param node
+   * @param distance
    * @param truck
    * @return
    */
-  // public double getRend(Node node, Truck truck) {
-  //   var a = distanceTo(node) / (10 - .5 * truck.currentCargo.size());
-  //   return a;
-  // }
-
   public double getRend(double distance, Truck truck) {
-    var a = distance / (10 - .5 * truck.currentCargo.size());
-    return a;
+    return distance / (10 - .5 * truck.currentCargo.size());
   }
 
   @Override

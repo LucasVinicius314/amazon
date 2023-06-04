@@ -24,48 +24,77 @@ public class App {
   static Truck bestSolution = null;
 
   public static void main(String[] args) {
+
     // Nome do arquivo de entrada.
-    final var filePath = "in-15.dat";
+    final var filePath = "in.dat";
+
     // Carga máxima do caminhão.
     final var maxCargo = 3;
+
+    // run(filePath, maxCargo, false, SolverMode.BRANCH_AND_BOUND);
+
+    runTests();
+  }
+
+  static Truck run(String filePath, int maxCargo, boolean asTest, SolverMode solverMode) {
+
+    nodes.clear();
+    allItems.clear();
+    bestSolution = null;
 
     // Inicializar a rede de nodes.
     initNetwork(filePath);
 
-    // Inicializar a UI.
-    initUI();
+    if (!asTest) {
+
+      // Inicializar a UI.
+      initUI();
+    }
 
     final var truck = new Truck();
 
     final var newNodes = new HashMap<>(nodes);
 
     for (final var node : newNodes.values()) {
+
       if (maxCargo < node.items.size()) {
-        System.out.println("Max cargo invlaido");
-        return;
+
+        Utils.log("Max cargo inválido.");
+
+        return null;
       }
+
       allItems.addAll(node.items);
     }
 
     final var rootNode = newNodes.get(0);
 
-    long init;
-    long end;
-
     truck.currentCargo.addAll(rootNode.items);
     truck.currentPath.push(rootNode);
 
-    init = System.currentTimeMillis();
+    final var then = System.currentTimeMillis();
 
-    Solver.bruteForce(newNodes, rootNode, truck, maxCargo);
-    // Solver.branchBound(newNodes, rootNode, truck, maxCargo);
+    if (solverMode == SolverMode.BRANCH_AND_BOUND) {
 
-    end = System.currentTimeMillis();
-    end -= init;
+      Utils.log("\n(Branch and bound)");
 
-    System.out.println("\nTempo: " + end + " ms");
-    Utils.log(String.format("%n%n%s", bestSolution));
+      Solver.branchBound(newNodes, rootNode, truck, maxCargo, !asTest);
 
+      Utils.log("\n");
+    } else {
+
+      Utils.log("\n(Brute force)");
+
+      Solver.bruteForce(newNodes, rootNode, truck, maxCargo, !asTest);
+
+      Utils.log("\n");
+    }
+
+    final var now = System.currentTimeMillis();
+
+    Utils.log(String.format("Solucao (%d ms):%n%s", now - then, bestSolution));
+
+    return bestSolution;
   }
 
   /**
@@ -78,6 +107,7 @@ public class App {
    * @return
    */
   static Node createNode(int key, double x, double y, String neighbours) {
+
     // Tentar recuperar o node já existente com esse id.
     var node = nodes.get(key);
 
@@ -122,6 +152,7 @@ public class App {
    * @return
    */
   static void initNetwork(String filePath) {
+
     // Buscar linhas de entrada do arquivo de entrada.
     final var lines = readInput(filePath);
 
@@ -160,6 +191,7 @@ public class App {
    * @return
    */
   static void initUI() {
+
     // Declarar a janela principal do app.
     final var frame = new JFrame("Main window");
 
@@ -205,5 +237,57 @@ public class App {
 
     // Retornar o array de saída.
     return list;
+  }
+
+  static void runTests() {
+
+    test(
+        "in-test-0.dat",
+        10,
+        new Truck(65.71809694373285,
+            new ArrayList<>(Arrays.asList(
+                0, 1, 2, 3, 4, 5, 0))));
+
+    test(
+        "in-test-1.dat",
+        10,
+        new Truck(246.2858,
+            new ArrayList<>(Arrays.asList(
+                0, 4, 7, 6, 13, 12, 2, 10, 1, 11, 3, 9, 8, 5, 0))));
+
+    test(
+        "in-test-2.dat",
+        10,
+        new Truck(102.7023,
+            new ArrayList<>(Arrays.asList(
+                0, 1, 2, 3, 5, 4, 9, 7, 8, 6, 0))));
+
+    test(
+        "in-test-3.dat",
+        3,
+        new Truck(257.5714,
+            new ArrayList<>(Arrays.asList(
+                0, 8, 10, 9, 11, 12, 3, 2, 13, 1, 14, 15, 6, 7, 5, 4, 0))));
+  }
+
+  static void test(String filePath, int maxCargo, Truck expectedResult) {
+
+    Utils.log(String.format("%n>>> <AVISO> Rodando teste para %s, carga máxima: %d%n", filePath, maxCargo));
+
+    final var branchAndBound = run(filePath, maxCargo, true, SolverMode.BRANCH_AND_BOUND);
+
+    if (!expectedResult.isEqualTo(branchAndBound)) {
+
+      throw new IllegalStateException("Test failed.");
+    }
+
+    final var bruteForce = run(filePath, maxCargo, true, SolverMode.BRUTE_FORCE);
+
+    if (!expectedResult.isEqualTo(bruteForce)) {
+
+      throw new IllegalStateException("Test failed.");
+    }
+
+    Utils.log(String.format("%n>>> <SUCESSO> Teste finalizado para %s, carga máxima: %d%n", filePath, maxCargo));
   }
 }

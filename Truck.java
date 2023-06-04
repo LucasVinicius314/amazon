@@ -1,47 +1,42 @@
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class Truck {
 
+  public Truck() {
+  }
+
+  public Truck(double rendimento, List<Integer> path) {
+
+    this.rendimento = rendimento;
+
+    for (final var id : path) {
+
+      currentPath.add(new Node(id, 0, 0));
+    }
+  }
+
   public double distance = 0;
 
-  public double rendimento = 0.0;
+  public double rendimento = 0;
 
   public Set<Integer> currentCargo = new HashSet<>();
 
   public Stack<Node> currentPath = new Stack<>();
 
-  public void add(Node node, Node nextNode) {
-
-    // distance += node.distanceTo(nextNode);
-    // rendimento += node.getRend(nextNode, this);
-    currentCargo.addAll(nextNode.items);
-    currentPath.push(nextNode);
-
-  }
-
   public void add(Node nextNode) {
 
     currentCargo.addAll(nextNode.items);
     currentPath.push(nextNode);
-
   }
 
   public void remove(Node nextNode) {
 
     currentCargo.removeAll(nextNode.items);
     currentPath.pop();
-
-  }
-
-  public void remove(Node node, Node nextNode) {
-
-    currentPath.pop();
-    currentCargo.removeAll(nextNode.items);
-    // distance -= node.distanceTo(nextNode);
-    // rendimento -= node.getRend(nextNode, this);
   }
 
   static Truck newInstance(Truck truck) {
@@ -56,11 +51,15 @@ public class Truck {
     return newTruck;
   }
 
+  public boolean isEqualTo(Truck truck) {
+
+    return toString().equals(truck.toString());
+  }
+
   @Override
   public String toString() {
 
-    return String.format("Truck d: %.4f r: %.4f%n%s",
-        distance,
+    return String.format("Truck r: %.4f%n%s",
         rendimento,
         currentPath
             .stream()
