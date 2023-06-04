@@ -24,11 +24,24 @@ public class Truck {
 
   public void add(Node nextNode) {
 
-    // distance += node.distanceTo(nextNode);
-    // rendimento += node.getRend(nextNode, this);
     currentCargo.addAll(nextNode.items);
     currentPath.push(nextNode);
 
+  }
+
+  public void remove(Node nextNode) {
+
+    currentCargo.removeAll(nextNode.items);
+    currentPath.pop();
+
+  }
+
+  public void remove(Node node, Node nextNode) {
+
+    currentPath.pop();
+    currentCargo.removeAll(nextNode.items);
+    // distance -= node.distanceTo(nextNode);
+    // rendimento -= node.getRend(nextNode, this);
   }
 
   static Truck newInstance(Truck truck) {
@@ -43,35 +56,18 @@ public class Truck {
     return newTruck;
   }
 
-  public void remove(Node node, Node nextNode) {
-
-    currentPath.pop();
-    currentCargo.removeAll(nextNode.items);
-    // distance -= node.distanceTo(nextNode);
-    // rendimento -= node.getRend(nextNode, this);
-  }
-
-  public void remove(Node nextNode) {
-
-    currentCargo.removeAll(nextNode.items);
-    currentPath.pop();
-
-    // distance -= node.distanceTo(nextNode);
-    // rendimento -= node.getRend(nextNode, this);
-  }
-
   // TODO: terminar a verificação se o caminhao ta valido.
-  
-  // blic bool valido(){
-  // int quantItens = 0;
-  // r (Node integer : currentPath) {
-  //     if(){
- 
-  //   }
-  //   }
- 
-  //   return true;
-  // }
+
+  public Boolean valido() {
+    int quantItens = 0;
+    for (Node integer : currentPath) {
+      // if(){
+
+      // }
+    }
+
+    return true;
+  }
 
   @Override
   public String toString() {

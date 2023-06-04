@@ -16,68 +16,80 @@ public class Solver {
     nodes.remove(node.key);
 
     // Remover o node atual da carga do caminhão.
-    var a = truck.currentCargo.remove(node.key);
+    var colocaCaminhao = truck.currentCargo.remove(node.key);
 
     // Print caso não há mais nodes para ir.
     if (nodes.isEmpty()) {
 
+      // Criar um clone do caminhão atual, para não modificá-lo incorretamente.
       final var newTruck = Truck.newInstance(truck);
 
-      var d = newTruck.currentPath.lastElement().distanceTo(newTruck.currentPath.firstElement());
-      var r = newTruck.currentPath.lastElement().getRend(d, truck);
+      var noPai = newTruck.currentPath.firstElement();
+      var ultimoNo = newTruck.currentPath.lastElement();
 
+      var d = ultimoNo.distanceTo(noPai);
+      var r = ultimoNo.getRend(d, truck);
+
+      // Adicionar a volta ate o no 0.
       newTruck.distance += d;
       newTruck.rendimento += r;
-      newTruck.add(newTruck.currentPath.lastElement(), App.nodes.get(0));
-      // newTruck.add(App.nodes.get(0).key, App.nodes.get(0));
+      newTruck.add(ultimoNo, App.nodes.get(0));
 
+      // Verificar se o novo caminhão é melhor que o melhor caminhão até agora
       if (App.bestSolution == null || newTruck.rendimento < App.bestSolution.rendimento) {
-        Utils.log(newTruck);
+        // Utils.log(newTruck);
         App.bestSolution = newTruck;
       }
     }
 
     // Viola restrição de carga max
-    if (!(truck.currentCargo.size() > maxCargo
-        || (App.bestSolution != null && App.bestSolution.rendimento < truck.rendimento))) {
+    // Viola restrição: se o redimento atual é maior que o melhor rendimento,
+    // não adianta fazer o no, pois é infrutifero
+
+    // if (!(truck.currentCargo.size() > maxCargo
+    // || (App.bestSolution != null && App.bestSolution.rendimento <
+    // truck.rendimento))) {
+    if (truck.currentCargo.size() <= maxCargo
+        && (App.bestSolution == null || App.bestSolution.rendimento > truck.rendimento)) {
 
       // Clonar lista de nodes.
       final var newNodes = new ArrayList<>(nodes.values());
+
       // Iterar sobre a lista de nodes clonada.
       for (final var newNode : newNodes) {
 
+        // Violação de restrição: indo para um node que deve receber itens, sem ter os
+        // itens no caminhão.
         if (App.allItems.contains(newNode.key)) {
-          // Violação de restrição: indo para um node que deve receber itens, sem ter os
-          // itens no caminhão.
           continue;
         }
 
-        // Remover os itens que foram pegos da lista de itens global.
-        App.allItems.removeAll(newNode.items);
-
-        salvador(nodes, node, newNode, truck, maxCargo);
-
-        // Colocar os itens que foram colocados de volta na lista de itens global.
-        App.allItems.addAll(newNode.items);
+        // Chamada recursiva do branchBound
+        chamadaBranchBound(nodes, node, newNode, truck, maxCargo);
 
       }
 
     }
-    if (a) {
+
+    // Voltar com o node atual para carga do caminhão.
+    if (colocaCaminhao) {
       truck.currentCargo.add(node.key);
     }
-    // Desfazer a remoção do node atual.
+
+    // Voltar com o node atual para o map.
     nodes.put(node.key, node);
   }
 
-  static void salvador(Map<Integer, Node> nodes, Node node, Node newNode, Truck truck, int maxCargo) {
-    // Adicionar o node.
-    // truck.add(node, newNode);
+  static void chamadaBranchBound(Map<Integer, Node> nodes, Node node, Node newNode, Truck truck, int maxCargo) {
+
+    // Remover os itens que foram pegos da lista de itens global.
+    App.allItems.removeAll(newNode.items);
+
+    // Calcular distancia e rendimento do no para o novoNo.
     var d = node.distanceTo(newNode);
     var r = node.getRend(d, truck);
 
-    // Fazer a adição do node.
-    truck.add(newNode);
+    truck.add(newNode); // Fazer a adição do node.
 
     truck.distance += d;
     truck.rendimento += r;
@@ -88,8 +100,10 @@ public class Solver {
     truck.rendimento -= r;
     truck.distance -= d;
 
-    // Desfazer a adição do node.
-    truck.remove(newNode);
+    truck.remove(newNode); // Desfazer a adição do node.
+
+    // Colocar os itens que foram pegos devolta, na lista de itens global.
+    App.allItems.addAll(newNode.items);
   }
 
   public static void bruteForce(Map<Integer, Node> nodes, Node node, Truck truck, int maxCargo) {
@@ -98,128 +112,49 @@ public class Solver {
     nodes.remove(node.key);
 
     // Remover o node atual da carga do caminhão.
-    var a = truck.currentCargo.remove(node.key);
+    var colocaCaminhao = truck.currentCargo.remove(node.key);
 
     // Print caso não há mais nodes para ir.
     if (nodes.isEmpty()) {
 
+      // Criar um clone do caminhão atual, para não modificá-lo incorretamente.
       final var newTruck = Truck.newInstance(truck);
 
-      var d = newTruck.currentPath.lastElement().distanceTo(newTruck.currentPath.firstElement());
-      var r = newTruck.currentPath.lastElement().getRend(d, truck);
+      var noPai = newTruck.currentPath.firstElement();
+      var ultimoNo = newTruck.currentPath.lastElement();
 
+      var d = ultimoNo.distanceTo(noPai);
+      var r = ultimoNo.getRend(d, truck);
+
+      // Adicionar a volta ate o no 0.
       newTruck.distance += d;
       newTruck.rendimento += r;
-      newTruck.add(newTruck.currentPath.lastElement(), App.nodes.get(0));
-      // newTruck.add(App.nodes.get(0).key, App.nodes.get(0));
+      newTruck.add(ultimoNo, App.nodes.get(0));
 
+      // Verificar se o novo caminhão é melhor que o melhor caminhão até agora
       if (App.bestSolution == null || newTruck.rendimento < App.bestSolution.rendimento) {
         Utils.log(newTruck);
         App.bestSolution = newTruck;
       }
     }
 
-    // Viola restrição de carga max
-    if (!(truck.currentCargo.size() > maxCargo)) {
+    // Clonar lista de nodes.
+    final var newNodes = new ArrayList<>(nodes.values());
 
-      // Clonar lista de nodes.
-      final var newNodes = new ArrayList<>(nodes.values());
-      var valorAgora = truck.rendimento;
-      // Iterar sobre a lista de nodes clonada.
-      for (final var newNode : newNodes) {
+    // Iterar sobre a lista de nodes clonada.
+    for (final var newNode : newNodes) {
 
-        if (App.allItems.contains(newNode.key)) {
-          // Violação de restrição: indo para um node que deve receber itens, sem ter os
-          // itens no caminhão.
-          continue;
-        }
-
-        // Remover os itens que foram pegos da lista de itens global.
-        App.allItems.removeAll(newNode.items);
-
-        salvador(nodes, node, newNode, truck, maxCargo);
-
-        // Colocar os itens que foram colocados de volta na lista de itens global.
-        App.allItems.addAll(newNode.items);
-
-      }
+      chamadaBranchBound(nodes, node, newNode, truck, maxCargo);
 
     }
 
-    if (a) {
+    // Voltar com o node atual para carga do caminhão.
+    if (colocaCaminhao) {
       truck.currentCargo.add(node.key);
     }
-    // Desfazer a remoção do node atual.
+
+    // Voltar com o node atual para o map.
     nodes.put(node.key, node);
   }
 
-  // public static void bruteForce(Map<Integer, Node> nodes, Node node, Truck
-  // truck, int maxCargo) {
-
-  // // Remover node atual do map de nodes.
-  // nodes.remove(node.key);
-
-  // // Remover o node atual da carga do caminhão.
-  // var a = truck.currentCargo.remove(node.key);
-
-  // // Viola restrição de carga max
-  // if (truck.currentCargo.size() > maxCargo) {
-  // truck.currentCargo.add(node.key);
-  // nodes.put(node.key, node);
-  // return;
-  // }
-
-  // // Clonar lista de nodes.
-  // final var newNodes = new ArrayList<>(nodes.values());
-
-  // // Iterar sobre a lista de nodes clonada.
-  // for (final var newNode : newNodes) {
-
-  // if (App.allItems.contains(newNode.key)) {
-  // // Violação de restrição: indo para um node que deve receber itens, sem ter
-  // os
-  // // itens no caminhão.
-  // continue;
-  // }
-
-  // // Remover os itens que foram pegos da lista de itens global.
-  // App.allItems.removeAll(newNode.items);
-
-  // // Adicionar o node.
-  // truck.add(node, newNode);
-
-  // // Expandir.
-  // bruteForce(nodes, newNode, truck, maxCargo);
-
-  // // Desfazer a adição do node.
-  // truck.remove(node, newNode);
-
-  // // Colocar os itens que foram colocados de volta na lista de itens global.
-  // App.allItems.addAll(newNode.items);
-
-  // System.out.println("-------------------");
-
-  // }
-
-  // // Print caso não há mais nodes para ir.
-  // if (nodes.isEmpty()) {
-
-  // final var newTruck = Truck.newInstance(truck);
-
-  // newTruck.add(newTruck.currentPath.lastElement(), App.nodes.get(0));
-
-  // Utils.log(newTruck);
-
-  // if (App.bestSolution == null || newTruck.rendimento <
-  // App.bestSolution.rendimento) {
-
-  // App.bestSolution = newTruck;
-  // }
-  // }
-  // if (a) {
-  // truck.currentCargo.add(node.key);
-  // }
-  // // Desfazer a remoção do node atual.
-  // nodes.put(node.key, node);
-  // }
 }
