@@ -25,7 +25,7 @@ public class App {
 
   public static void main(String[] args) {
     // Nome do arquivo de entrada.
-    final var filePath = "in.dat";
+    final var filePath = "in-10.dat";
     // Carga máxima do caminhão.
     final var maxCargo = 2;
 
@@ -40,6 +40,10 @@ public class App {
     final var newNodes = new HashMap<>(nodes);
 
     for (final var node : newNodes.values()) {
+      if (maxCargo < node.items.size()) {
+        System.out.println("Max cargo invlaido");
+        return;
+      }
       allItems.addAll(node.items);
     }
 

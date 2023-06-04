@@ -36,15 +36,11 @@ public class Solver {
         // Utils.log(newTruck);
         App.bestSolution = newTruck;
       }
-    }
+    } else
 
     // Viola restrição de carga max
     // Viola restrição: se o redimento atual é maior que o melhor rendimento,
     // não adianta fazer o no, pois é infrutifero
-
-    // if (!(truck.currentCargo.size() > maxCargo
-    // || (App.bestSolution != null && App.bestSolution.rendimento <
-    // truck.rendimento))) {
     if (truck.currentCargo.size() <= maxCargo
         && (App.bestSolution == null || App.bestSolution.rendimento > truck.rendimento)) {
 
