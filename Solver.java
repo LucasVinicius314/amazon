@@ -11,6 +11,8 @@ public class Solver {
 
   public static void branchBound(Map<Integer, Node> nodes, Node node, Truck truck, int maxCargo, boolean verbose) {
 
+    App.calls++;
+
     // Remover node atual do map de nodes.
     nodes.remove(node.key);
 
@@ -129,6 +131,8 @@ public class Solver {
   }
 
   public static void bruteForce(Map<Integer, Node> nodes, Node node, Truck truck, int maxCargo, boolean verbose) {
+
+    App.calls++;
 
     // Remover node atual do map de nodes.
     nodes.remove(node.key);

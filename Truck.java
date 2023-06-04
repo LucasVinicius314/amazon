@@ -25,6 +25,8 @@ public class Truck {
 
   public long time = 0;
 
+  public long calls = 0;
+
   public Set<Integer> currentCargo = new HashSet<>();
 
   public Stack<Node> currentPath = new Stack<>();

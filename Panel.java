@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
@@ -13,6 +14,33 @@ public class Panel extends JPanel {
   SolverMode solverMode;
   Truck truck;
 
+  String getItemsList() {
+
+    final var itemsList = new ArrayList<java.util.List<Integer>>();
+
+    final var cargo = new ArrayList<Integer>();
+
+    for (final var node : truck.currentPath) {
+
+      cargo.addAll(node.items);
+
+      final var index = cargo.indexOf(node.key);
+
+      if (index != -1) {
+
+        cargo.remove(index);
+      }
+
+      itemsList.add(new ArrayList<>(cargo));
+    }
+
+    itemsList.remove(itemsList.size() - 1);
+
+    return itemsList.stream()
+        .map(e -> String.format("[%s]", e.stream().map(String::valueOf).collect(Collectors.joining(","))))
+        .collect(Collectors.joining(","));
+  }
+
   @Override
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
@@ -24,10 +52,11 @@ public class Panel extends JPanel {
 
     g.drawString(
         String.format(
-            "%d ms, carga máxima: %d, modo: %s",
+            "%d ms, carga máxima: %d, modo: %s, chamadas: %d",
             truck.time,
             maxCargo,
-            solverMode == SolverMode.BRANCH_AND_BOUND ? "Branch and Bound" : "Brute Force"),
+            solverMode == SolverMode.BRANCH_AND_BOUND ? "Branch and Bound" : "Brute Force",
+            truck.calls),
         8, 16);
 
     g.drawString(
@@ -38,6 +67,8 @@ public class Panel extends JPanel {
         8, 32);
 
     g.drawString(String.format("caminho: %s", path), 8, 48);
+
+    g.drawString(String.format("itens no caminho: %s", getItemsList()), 8, 64);
 
     // Iterar sobre cada node da network.
     for (final var node : App.nodes.values()) {

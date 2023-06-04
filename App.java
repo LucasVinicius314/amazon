@@ -18,7 +18,9 @@ import javax.swing.border.EmptyBorder;
  */
 public class App {
 
-  static double gridOffset = 64;
+  static long calls = 0;
+
+  static int gridOffset = 96;
 
   // Map principal com os nodes indexados por id.
   static Map<Integer, Node> nodes = new HashMap<>();
@@ -77,12 +79,16 @@ public class App {
 
       Utils.log("\n(Branch and bound)");
 
+      App.calls = 0;
+
       Solver.branchBound(newNodes, rootNode, truck, maxCargo, !isTest);
 
       Utils.log("\n");
     } else {
 
       Utils.log("\n(Brute force)");
+
+      App.calls = 0;
 
       Solver.bruteForce(newNodes, rootNode, truck, maxCargo, !isTest);
 
@@ -98,6 +104,7 @@ public class App {
     if (bestSolution != null) {
 
       bestSolution.time = diff;
+      bestSolution.calls = App.calls;
     }
 
     return bestSolution;
@@ -246,7 +253,7 @@ public class App {
 
     // Instanciar janela secundária.
     final var simulationFrame = new JFrame("Simulation window");
-    simulationFrame.setSize(600, 600);
+    simulationFrame.setSize(500 + 100 + gridOffset, 500 + 100 + gridOffset);
     simulationFrame.setVisible(true);
 
     // Instanciar janela do gráfico.
@@ -254,7 +261,7 @@ public class App {
     panel.truck = truck;
     panel.maxCargo = maxCargo;
     panel.solverMode = solverMode;
-    panel.setSize(564, 564);
+    panel.setSize(500 + gridOffset, 500 + gridOffset);
     simulationFrame.add(panel);
 
     // Referência para alterar o valor da animação evitando erro de escopo.
