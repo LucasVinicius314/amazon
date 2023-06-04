@@ -56,19 +56,6 @@ public class Truck {
     return newTruck;
   }
 
-  // TODO: terminar a verificação se o caminhao ta valido.
-
-  public Boolean valido() {
-    int quantItens = 0;
-    for (Node integer : currentPath) {
-      // if(){
-
-      // }
-    }
-
-    return true;
-  }
-
   @Override
   public String toString() {
 

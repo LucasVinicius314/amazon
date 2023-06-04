@@ -42,10 +42,10 @@ public class Node {
    * @param truck
    * @return
    */
-  public double getRend(Node node, Truck truck) {
-    var a = distanceTo(node) / (10 - .5 * truck.currentCargo.size());
-    return a;
-  }
+  // public double getRend(Node node, Truck truck) {
+  //   var a = distanceTo(node) / (10 - .5 * truck.currentCargo.size());
+  //   return a;
+  // }
 
   public double getRend(double distance, Truck truck) {
     var a = distance / (10 - .5 * truck.currentCargo.size());

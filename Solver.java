@@ -102,6 +102,32 @@ public class Solver {
     App.allItems.addAll(newNode.items);
   }
 
+  static void chamadaBruteForce(Map<Integer, Node> nodes, Node node, Node newNode, Truck truck, int maxCargo) {
+
+    // Remover os itens que foram pegos da lista de itens global.
+    App.allItems.removeAll(newNode.items);
+
+    // Calcular distancia e rendimento do no para o novoNo.
+    var d = node.distanceTo(newNode);
+    var r = node.getRend(d, truck);
+
+    truck.add(newNode); // Fazer a adição do node.
+
+    truck.distance += d;
+    truck.rendimento += r;
+
+    // Expandir.
+    bruteForce(nodes, newNode, truck, maxCargo);
+
+    truck.rendimento -= r;
+    truck.distance -= d;
+
+    truck.remove(newNode); // Desfazer a adição do node.
+
+    // Colocar os itens que foram pegos devolta, na lista de itens global.
+    App.allItems.addAll(newNode.items);
+  }
+
   public static void bruteForce(Map<Integer, Node> nodes, Node node, Truck truck, int maxCargo) {
 
     // Remover node atual do map de nodes.
@@ -124,7 +150,8 @@ public class Solver {
       newTruck.add(newTruck.currentPath.lastElement(), App.nodes.get(0));
 
       // Verificar se o novo caminhão é melhor que o melhor caminhão até agora
-      if (newTruck.valido()) {
+
+      if (truck.currentCargo.size() == 0) {
         if (App.bestSolution == null || newTruck.rendimento < App.bestSolution.rendimento) {
           Utils.log(newTruck);
           App.bestSolution = newTruck;
@@ -138,7 +165,7 @@ public class Solver {
     // Iterar sobre a lista de nodes clonada.
     for (final var newNode : newNodes) {
 
-      chamadaBranchBound(nodes, node, newNode, truck, maxCargo);
+      chamadaBruteForce(nodes, node, newNode, truck, maxCargo);
 
     }
 
