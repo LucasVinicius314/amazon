@@ -153,18 +153,19 @@ public class Solver {
           App.bestSolution = newTruck;
         }
       }
+    } else if (truck.currentCargo.size() <= maxCargo) {
+
+      // Clonar lista de nodes.
+      final var newNodes = new ArrayList<>(nodes.values());
+
+      // Iterar sobre a lista de nodes clonada.
+      for (final var newNode : newNodes) {
+
+        chamadaBruteForce(nodes, node, newNode, truck, maxCargo);
+
+      }
+
     }
-
-    // Clonar lista de nodes.
-    final var newNodes = new ArrayList<>(nodes.values());
-
-    // Iterar sobre a lista de nodes clonada.
-    for (final var newNode : newNodes) {
-
-      chamadaBruteForce(nodes, node, newNode, truck, maxCargo);
-
-    }
-
     // Voltar com o node atual para carga do caminhão.
     if (colocaCaminhao) {
       truck.currentCargo.add(node.key);
