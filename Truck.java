@@ -1,3 +1,9 @@
+/*                                     
+Autores: João Pedro Barroso da Silva Neto
+         Lucas Vinicius do Santos Coelho
+         Vinícius Henrique Giovanini
+*/
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

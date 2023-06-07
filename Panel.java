@@ -1,3 +1,9 @@
+/*                                     
+Autores: João Pedro Barroso da Silva Neto
+         Lucas Vinicius do Santos Coelho
+         Vinícius Henrique Giovanini
+*/
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.stream.Collectors;

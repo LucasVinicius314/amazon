@@ -1,3 +1,9 @@
+/*                                     
+Autores: João Pedro Barroso da Silva Neto
+         Lucas Vinicius do Santos Coelho
+         Vinícius Henrique Giovanini
+*/
+
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,7 +38,7 @@ public class App {
   public static void main(String[] args) {
 
     // Nome do arquivo de entrada.
-    final var filePath = "in.dat";
+    final var filePath = "in-20-3.dat";
 
     // Carga máxima do caminhão.
     final var maxCargo = 3;
