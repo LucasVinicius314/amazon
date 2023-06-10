@@ -42,7 +42,7 @@ public class App {
   public static void main(String[] args) {
 
     // Nome do arquivo de entrada.
-    final var caminhoDoArquivo = "in.dat";
+    final var caminhoDoArquivo = "testes/in.dat";
 
     // Carga máxima do caminhão.
     final var cargaMaxima = 2;
@@ -353,28 +353,28 @@ public class App {
   static void executarTestes() {
 
     testar(
-        "in-test-0.dat",
+        "testes/in-test-0.dat",
         10,
         new Caminhao(65.71809694373285,
             new ArrayList<>(Arrays.asList(
                 0, 1, 2, 3, 4, 5, 0))));
 
     testar(
-        "in-test-1.dat",
+        "testes/in-test-1.dat",
         10,
         new Caminhao(246.2858,
             new ArrayList<>(Arrays.asList(
                 0, 4, 7, 6, 13, 12, 2, 10, 1, 11, 3, 9, 8, 5, 0))));
 
     testar(
-        "in-test-2.dat",
+        "testes/in-test-2.dat",
         10,
         new Caminhao(102.7023,
             new ArrayList<>(Arrays.asList(
                 0, 1, 2, 3, 5, 4, 9, 7, 8, 6, 0))));
 
     testar(
-        "in-test-3.dat",
+        "testes/in-test-3.dat",
         3,
         new Caminhao(257.5714,
             new ArrayList<>(Arrays.asList(
