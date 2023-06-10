@@ -48,9 +48,9 @@ public class App {
     final var cargaMaxima = 2;
 
     // Inicializar a UI.
-    // inicializarUI(caminhoDoArquivo, cargaMaxima);
+    inicializarUI(caminhoDoArquivo, cargaMaxima);
 
-    executarTestes();
+    // executarTestes();
   }
 
   /**
