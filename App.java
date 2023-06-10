@@ -1,8 +1,7 @@
-/*                                     
-Autores: João Pedro Barroso da Silva Neto
-         Lucas Vinicius do Santos Coelho
-         Vinícius Henrique Giovanini
-*/
+// Autores:
+// - João Pedro Barroso da Silva Neto
+// - Lucas Vinicius do Santos Gonçalves Coelho
+// - Vinícius Henrique Giovanini
 
 import java.awt.*;
 import java.io.File;
@@ -20,282 +19,303 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Classe principal do app.
+ * Classe principal do programa.
  */
 public class App {
 
-  static long calls = 0;
+  static long chamadas = 0;
 
-  static int gridOffset = 96;
+  static int offset = 96;
 
-  // Map principal com os nodes indexados por id.
-  static Map<Integer, Node> nodes = new HashMap<>();
+  // Map principal com as lojas indexadas por id.
+  static Map<Integer, Loja> lojas = new HashMap<>();
 
-  static Set<Integer> allItems = new HashSet<>();
+  static Set<Integer> todosOsProdutos = new HashSet<>();
 
-  static Truck bestSolution = null;
+  static Caminhao melhorSolucao = null;
 
+  /**
+   * Método principal do programa.
+   * 
+   * @param args
+   */
   public static void main(String[] args) {
 
     // Nome do arquivo de entrada.
-    final var filePath = "in-20-3.dat";
+    final var caminhoDoArquivo = "in.dat";
 
     // Carga máxima do caminhão.
-    final var maxCargo = 3;
+    final var cargaMaxima = 2;
 
     // Inicializar a UI.
-    initUI(filePath, maxCargo);
+    // inicializarUI(caminhoDoArquivo, cargaMaxima);
 
-    // runTests();
+    executarTestes();
   }
 
-  static Truck run(String filePath, int maxCargo, boolean isTest, SolverMode solverMode) {
+  /**
+   * Método para resolver o problema a partir de uma entrada e de um algoritmo.
+   * 
+   * @param caminhoDoArquivo
+   * @param cargaMaxima
+   * @param teste
+   * @param algoritmo
+   * @return
+   */
+  static Caminhao executar(String caminhoDoArquivo, int cargaMaxima, boolean teste, Algoritmo algoritmo) {
 
-    nodes.clear();
-    allItems.clear();
-    bestSolution = null;
+    lojas.clear();
+    todosOsProdutos.clear();
+    melhorSolucao = null;
 
-    // Inicializar a rede de nodes.
-    initNetwork(filePath);
+    // Inicializar a rede de lojas.
+    inicializarRedeDeLojas(caminhoDoArquivo);
 
-    final var truck = new Truck();
+    final var caminhao = new Caminhao();
 
-    final var newNodes = new HashMap<>(nodes);
+    final var novaListaDeLojas = new HashMap<>(lojas);
 
-    for (final var node : newNodes.values()) {
+    for (final var loja : novaListaDeLojas.values()) {
 
-      if (maxCargo < node.items.size()) {
+      if (cargaMaxima < loja.produtos.size()) {
 
-        Utils.log("Max cargo inválido.");
+        Utilitarios.log("Carga máxima inválida.");
 
         return null;
       }
 
-      allItems.addAll(node.items);
+      todosOsProdutos.addAll(loja.produtos);
     }
 
-    final var rootNode = newNodes.get(0);
+    final var lojaInicial = novaListaDeLojas.get(0);
 
-    truck.currentCargo.addAll(rootNode.items);
-    truck.currentPath.push(rootNode);
+    caminhao.cargaAtual.addAll(lojaInicial.produtos);
+    caminhao.caminhoAtual.push(lojaInicial);
 
-    final var then = System.currentTimeMillis();
+    final var antes = System.currentTimeMillis();
 
-    if (solverMode == SolverMode.BRANCH_AND_BOUND) {
+    if (algoritmo == Algoritmo.BRANCH_AND_BOUND) {
 
-      Utils.log("\n(Branch and bound)");
+      Utilitarios.log("\n(Branch and bound)");
 
-      App.calls = 0;
+      App.chamadas = 0;
 
-      Solver.branchBound(newNodes, rootNode, truck, maxCargo, !isTest);
+      Solucao.branchAndBound(novaListaDeLojas, lojaInicial, caminhao, cargaMaxima, !teste);
 
-      Utils.log("\n");
+      Utilitarios.log("\n");
     } else {
 
-      Utils.log("\n(Brute force)");
+      Utilitarios.log("\n(Brute force)");
 
-      App.calls = 0;
+      App.chamadas = 0;
 
-      Solver.bruteForce(newNodes, rootNode, truck, maxCargo, !isTest);
+      Solucao.bruteForce(novaListaDeLojas, lojaInicial, caminhao, cargaMaxima, !teste);
 
-      Utils.log("\n");
+      Utilitarios.log("\n");
     }
 
-    final var now = System.currentTimeMillis();
+    final var agora = System.currentTimeMillis();
 
-    final var diff = now - then;
+    final var tempoDecorrido = agora - antes;
 
-    Utils.log(String.format("Solucao (%d ms):%n%s", diff, bestSolution));
+    Utilitarios.log(String.format("Solucao (%d ms):%n%s", tempoDecorrido, melhorSolucao));
 
-    if (bestSolution != null) {
+    if (melhorSolucao != null) {
 
-      bestSolution.time = diff;
-      bestSolution.calls = App.calls;
+      melhorSolucao.tempoDecorrido = tempoDecorrido;
+      melhorSolucao.chamadas = App.chamadas;
     }
 
-    return bestSolution;
+    return melhorSolucao;
   }
 
   /**
-   * Método para criar um node a partir do id, posição e nodes vizinhos.
+   * Método para criar uma loja a partir do id, posição e produtos.
    * 
-   * @param key
+   * @param id
    * @param x
    * @param y
-   * @param neighbours
+   * @param produtos
    * @return
    */
-  static Node createNode(int key, double x, double y, String neighbours) {
+  static Loja criarLoja(int id, double x, double y, String produtos) {
 
-    // Tentar recuperar o node já existente com esse id.
-    var node = nodes.get(key);
+    // Tentar recuperar a loja já existente com esse id.
+    var loja = lojas.get(id);
 
-    if (node == null) {
-      // Caso o node não exista, criá-lo.
-      node = new Node(key, x, y);
+    if (loja == null) {
+      // Caso a loja não exista, criá-la.
+      loja = new Loja(id, x, y);
     } else {
-      // Caso o node exista, atualizar suas coordenadas.
-      node.x = x;
-      node.y = y;
+      // Caso a loja exista, atualizar suas coordenadas.
+      loja.x = x;
+      loja.y = y;
     }
 
-    // Caso o node tenha vizinhos.
-    if (neighbours != null) {
-      // Dividir e iterar sobre cada elemento da string de vizinhos do node.
-      for (final var item : neighbours.split(",")) {
-        final var neighbourKey = Integer.parseInt(item);
+    // Caso a loja tenha produtos.
+    if (produtos != null) {
+      // Dividir e iterar sobre cada produto da string de produtos da loja.
+      for (final var elemento : produtos.split(",")) {
+        final var produto = Integer.parseInt(elemento);
 
-        // Tentar recuperar o vizinho já existente.
-        var neighbour = nodes.get(neighbourKey);
+        // Tentar recuperar a loja já existente.
+        var lojaDestino = lojas.get(produto);
 
-        // Criar o vizinho caso ele não exista.
-        if (neighbour == null) {
-          neighbour = createNode(neighbourKey, 0, 0, null);
+        // Criar a loja destino caso ela não exista.
+        if (lojaDestino == null) {
+          lojaDestino = criarLoja(produto, 0, 0, null);
         }
 
-        // Associar node -> vizinho.
-        node.items.add(neighbour.key);
+        // Associar loja -> loja destino.
+        loja.produtos.add(lojaDestino.id);
       }
     }
 
-    // Adicionar o node criado ao map de nodes.
-    nodes.put(key, node);
+    // Adicionar a loja criada ao map de lojas.
+    lojas.put(id, loja);
 
-    // Retornar o node criado.
-    return node;
+    // Retornar a loja criada.
+    return loja;
   }
 
   /**
-   * Método para inicializar a network de nodes a partir do arquivo de entrada.
+   * Método para inicializar a rede de lojas a partir do arquivo de entrada.
    * 
    * @return
    */
-  static void initNetwork(String filePath) {
+  static void inicializarRedeDeLojas(String caminhoDoArquivo) {
 
     // Buscar linhas de entrada do arquivo de entrada.
-    final var lines = readInput(filePath);
+    final var linhas = lerEntrada(caminhoDoArquivo);
 
     // Iterar sobre as linhas do arquivo de entrada.
-    for (final var line : lines) {
+    for (final var linha : linhas) {
       // Dividir a linha em cada espaço.
-      final var args = Arrays.asList(line.split(" "));
+      final var partes = Arrays.asList(linha.split(" "));
 
-      // Pegar o primeiro elemento da linha, o id do node.
-      final var index = Integer.parseInt(args.get(0));
-      // Pegar o segundo elemento da linha, a coordenada x do node.
-      final var x = Double.parseDouble(args.get(1)) + gridOffset;
-      // Pegar o terceiro elemento da linha, a coordenada y do node.
-      final var y = Double.parseDouble(args.get(2)) + gridOffset;
+      // Pegar o primeiro elemento da linha, o id da loja.
+      final var id = Integer.parseInt(partes.get(0));
+      // Pegar o segundo elemento da linha, a coordenada x da loja.
+      final var x = Double.parseDouble(partes.get(1)) + offset;
+      // Pegar o terceiro elemento da linha, a coordenada y da loja.
+      final var y = Double.parseDouble(partes.get(2)) + offset;
 
-      // Caso a linha de entrada tenha vizinhos.
-      if (args.size() > 3) {
-        // Pegar os vizinhos da linha e colocar numa string separada por vírgula.
-        final var neighbours = args
-            .subList(3, args.size())
+      // Caso a linha de entrada tenha produtos.
+      if (partes.size() > 3) {
+        // Pegar os produtos da linha e colocar numa string separada por vírgula.
+        final var produtos = partes
+            .subList(3, partes.size())
             .stream()
             .collect(Collectors.joining(","));
 
-        // Criar node com vizinhos.
-        createNode(index, x, y, neighbours);
+        // Criar loja com produtos.
+        criarLoja(id, x, y, produtos);
       } else {
-        // Criar node sem vizinhos.
-        createNode(index, x, y, null);
+        // Criar loja sem produtos.
+        criarLoja(id, x, y, null);
       }
     }
   }
 
   /**
-   * Método para inicializar a UI a partir dos nodes da network.
+   * Método para inicializar a UI a partir das lojas da rede de lojas.
    * 
    * @return
    */
-  static void initUI(String filePath, int maxCargo) {
+  static void inicializarUI(String caminhoDoArquivo, int cargaMaxima) {
 
     // Instanciar janela principal.
-    final var frame = new JFrame("Main window");
-    frame.setLayout(new FlowLayout(0));
+    final var janela = new JFrame("Janela Principal");
+    janela.setLayout(new FlowLayout(0));
 
     // Instanciar coluna.
-    final var column = new JPanel();
-    column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
-    column.setBorder(new EmptyBorder(8, 8, 8, 8));
-    frame.add(column);
+    final var coluna = new JPanel();
+    coluna.setLayout(new BoxLayout(coluna, BoxLayout.Y_AXIS));
+    coluna.setBorder(new EmptyBorder(8, 8, 8, 8));
+    janela.add(coluna);
 
     // Instanciar título.
-    final var label = new JLabel("Entrega de produtos com Branch and Bound e Brute Force");
-    label.setBorder(new EmptyBorder(0, 0, 8, 0));
-    column.add(label);
+    final var titulo = new JLabel("Entrega de produtos com Branch and Bound e Brute Force");
+    titulo.setBorder(new EmptyBorder(0, 0, 8, 0));
+    coluna.add(titulo);
 
     // Instanciar botão de branch and bound.
-    final var branchAndBoundButton = new JButton("Branch and Bound");
-    branchAndBoundButton.addActionListener(e -> {
+    final var botaoBranchAndBound = new JButton("Branch and Bound");
+    botaoBranchAndBound.addActionListener(e -> {
 
-      final var truck = run(filePath, maxCargo, false, SolverMode.BRANCH_AND_BOUND);
+      final var caminhao = executar(caminhoDoArquivo, cargaMaxima, false, Algoritmo.BRANCH_AND_BOUND);
 
-      showSimulationWindow(truck, maxCargo, SolverMode.BRANCH_AND_BOUND);
+      mostrarJanelaDeSimulacao(caminhao, cargaMaxima, Algoritmo.BRANCH_AND_BOUND);
     });
-    column.add(branchAndBoundButton);
+    coluna.add(botaoBranchAndBound);
 
     // Instanciar separador para adicionar um espaço entre os botões.
-    final var spacer = new JPanel();
-    spacer.setSize(0, 8);
-    column.add(spacer);
+    final var espacador = new JPanel();
+    espacador.setSize(0, 8);
+    coluna.add(espacador);
 
     // Instanciar botão de brute force.
-    final var bruteForceButton = new JButton("Brute Force");
-    bruteForceButton.addActionListener(e -> {
+    final var botaoDeBruteForce = new JButton("Brute Force");
+    botaoDeBruteForce.addActionListener(e -> {
 
-      final var truck = run(filePath, maxCargo, false, SolverMode.BRUTE_FORCE);
+      final var caminhao = executar(caminhoDoArquivo, cargaMaxima, false, Algoritmo.BRUTE_FORCE);
 
-      showSimulationWindow(truck, maxCargo, SolverMode.BRUTE_FORCE);
+      mostrarJanelaDeSimulacao(caminhao, cargaMaxima, Algoritmo.BRUTE_FORCE);
     });
-    column.add(bruteForceButton);
+    coluna.add(botaoDeBruteForce);
 
-    frame.setVisible(true);
-    frame.pack();
+    janela.setVisible(true);
+    janela.pack();
   }
 
-  static void showSimulationWindow(Truck truck, int maxCargo, SolverMode solverMode) {
+  /**
+   * Método para mostrar a janela de simulação do programa.
+   * 
+   * @param caminhao
+   * @param cargaMaxima
+   * @param algoritmo
+   */
+  static void mostrarJanelaDeSimulacao(Caminhao caminhao, int cargaMaxima, Algoritmo algoritmo) {
 
     // Instanciar janela secundária.
-    final var simulationFrame = new JFrame("Simulation window");
-    simulationFrame.setSize(500 + 100 + gridOffset, 500 + 100 + gridOffset);
-    simulationFrame.setVisible(true);
+    final var janela = new JFrame("Janela de Simulação");
+    janela.setSize(500 + 100 + offset, 500 + 100 + offset);
+    janela.setVisible(true);
 
     // Instanciar janela do gráfico.
-    final var panel = new Panel();
-    panel.truck = truck;
-    panel.maxCargo = maxCargo;
-    panel.solverMode = solverMode;
-    panel.setSize(500 + gridOffset, 500 + gridOffset);
-    simulationFrame.add(panel);
+    final var painel = new Painel();
+    painel.caminhao = caminhao;
+    painel.cargaMaxima = cargaMaxima;
+    painel.algoritmo = algoritmo;
+    painel.setSize(500 + offset, 500 + offset);
+    janela.add(painel);
 
     // Referência para alterar o valor da animação evitando erro de escopo.
-    final var intRef = new IntRef();
+    final var referenciaInt = new ReferenciaInt();
 
-    // Instanciar time da animação
-    final var timer = new javax.swing.Timer(1000, y -> {
+    // Instanciar temporizador da animação.
+    final var temporizador = new javax.swing.Timer(1000, y -> {
     });
 
     // Definir listener do timer.
-    timer.addActionListener(y -> {
+    temporizador.addActionListener(y -> {
 
       // Atualizar estado da animação.
-      panel.steps = intRef.value;
+      painel.passos = referenciaInt.valor;
 
       // Re renderizar a janela.
-      simulationFrame.repaint();
+      janela.repaint();
 
       // Parar animação caso o caminho chegue ao último ponto.
-      if (intRef.value == App.bestSolution.currentPath.size() - 1) {
+      if (referenciaInt.valor == App.melhorSolucao.caminhoAtual.size() - 1) {
 
-        timer.stop();
+        temporizador.stop();
       }
 
-      intRef.value++;
+      referenciaInt.valor++;
     });
 
-    timer.start();
+    temporizador.start();
   }
 
   /**
@@ -303,84 +323,100 @@ public class App {
    * 
    * @return
    */
-  static List<String> readInput(String filePath) {
-    // Declarar o array de saída.
-    final var list = new ArrayList<String>();
+  static List<String> lerEntrada(String caminhoDoArquivo) {
+    // Declarar a lista de saída.
+    final var lista = new ArrayList<String>();
 
     try {
       // Ler o arquivo de entrada.
 
-      final var file = new File(filePath);
-      final var scanner = new Scanner(file);
+      final var arquivo = new File(caminhoDoArquivo);
+      final var scanner = new Scanner(arquivo);
 
       while (scanner.hasNextLine()) {
-        list.add(scanner.nextLine());
+        lista.add(scanner.nextLine());
       }
 
       scanner.close();
     } catch (FileNotFoundException e) {
-      Utils.log("File not found.");
+      Utilitarios.log("Arquivo não encontrado.");
       e.printStackTrace();
     }
 
-    // Retornar o array de saída.
-    return list;
+    // Retornar a lista de saída.
+    return lista;
   }
 
-  static void runTests() {
+  /**
+   * Método para a execução de testes básicos.
+   */
+  static void executarTestes() {
 
-    test(
+    testar(
         "in-test-0.dat",
         10,
-        new Truck(65.71809694373285,
+        new Caminhao(65.71809694373285,
             new ArrayList<>(Arrays.asList(
                 0, 1, 2, 3, 4, 5, 0))));
 
-    test(
+    testar(
         "in-test-1.dat",
         10,
-        new Truck(246.2858,
+        new Caminhao(246.2858,
             new ArrayList<>(Arrays.asList(
                 0, 4, 7, 6, 13, 12, 2, 10, 1, 11, 3, 9, 8, 5, 0))));
 
-    test(
+    testar(
         "in-test-2.dat",
         10,
-        new Truck(102.7023,
+        new Caminhao(102.7023,
             new ArrayList<>(Arrays.asList(
                 0, 1, 2, 3, 5, 4, 9, 7, 8, 6, 0))));
 
-    test(
+    testar(
         "in-test-3.dat",
         3,
-        new Truck(257.5714,
+        new Caminhao(257.5714,
             new ArrayList<>(Arrays.asList(
                 0, 8, 10, 9, 11, 12, 3, 2, 13, 1, 14, 15, 6, 7, 5, 4, 0))));
   }
 
-  static void test(String filePath, int maxCargo, Truck expectedResult) {
+  /**
+   * Método para a execução de um teste a partir de uma entrada e o valor para
+   * comparação de resultados.
+   * 
+   * @param caminhoDoArquivo
+   * @param cargaMaxima
+   * @param resultadoEsperado
+   */
+  static void testar(String caminhoDoArquivo, int cargaMaxima, Caminhao resultadoEsperado) {
 
-    Utils.log(String.format("%n>>> <AVISO> Rodando teste para %s, carga máxima: %d%n", filePath, maxCargo));
+    Utilitarios
+        .log(String.format("%n>>> <AVISO> Rodando teste para %s, carga máxima: %d%n", caminhoDoArquivo, cargaMaxima));
 
-    final var branchAndBound = run(filePath, maxCargo, true, SolverMode.BRANCH_AND_BOUND);
+    final var branchAndBound = executar(caminhoDoArquivo, cargaMaxima, true, Algoritmo.BRANCH_AND_BOUND);
 
-    if (!expectedResult.isEqualTo(branchAndBound)) {
+    if (!resultadoEsperado.igualA(branchAndBound)) {
 
-      throw new IllegalStateException("Test failed.");
+      throw new IllegalStateException("Teste falhou.");
     }
 
-    final var bruteForce = run(filePath, maxCargo, true, SolverMode.BRUTE_FORCE);
+    final var bruteForce = executar(caminhoDoArquivo, cargaMaxima, true, Algoritmo.BRUTE_FORCE);
 
-    if (!expectedResult.isEqualTo(bruteForce)) {
+    if (!resultadoEsperado.igualA(bruteForce)) {
 
-      throw new IllegalStateException("Test failed.");
+      throw new IllegalStateException("Teste falhou.");
     }
 
-    Utils.log(String.format("%n>>> <SUCESSO> Teste finalizado para %s, carga máxima: %d%n", filePath, maxCargo));
+    Utilitarios.log(
+        String.format("%n>>> <SUCESSO> Teste finalizado para %s, carga máxima: %d%n", caminhoDoArquivo, cargaMaxima));
   }
 }
 
-class IntRef {
+/**
+ * Classe que representa uma referência para um número inteiro.
+ */
+class ReferenciaInt {
 
-  public int value = 0;
+  public int valor = 0;
 }
