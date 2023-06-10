@@ -34,7 +34,7 @@ public class Solucao {
     // Remover o produto para a loja atual da carga do caminhão.
     final var colocaCaminhao = caminhao.cargaAtual.remove(loja.id);
 
-    // Print caso não há mais lojas para ir.
+    // Caso não há mais lojas para ir.
     if (lojas.isEmpty()) {
 
       // Criar um clone do caminhão atual, para não modificá-lo incorretamente.
@@ -152,7 +152,7 @@ public class Solucao {
     // Remover o produto para a loja atual da carga do caminhão.
     final var colocaCaminhao = caminhao.cargaAtual.remove(loja.id);
 
-    // Print caso não há mais lojas para ir.
+    // Caso não há mais lojas para ir.
     if (lojas.isEmpty()) {
 
       // Criar um clone do caminhão atual, para não modificá-lo incorretamente.
