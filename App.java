@@ -42,10 +42,10 @@ public class App {
   public static void main(String[] args) {
 
     // Nome do arquivo de entrada.
-    final var caminhoDoArquivo = "testes/in.dat";
+    final var caminhoDoArquivo = "testes/lojas3.txt";
 
     // Carga máxima do caminhão.
-    final var cargaMaxima = 2;
+    final var cargaMaxima = 3;
 
     // Inicializar a UI.
     inicializarUI(caminhoDoArquivo, cargaMaxima);
